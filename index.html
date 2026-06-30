@@ -1,0 +1,2740 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Annadata — Ek Daawat, Hazaron Zindagiyaan | End Food Waste in India</title>
+  <meta name="description" content="Annadata connects wedding and event organizers with surplus food to registered NGOs who distribute it to those in need. Together we can end hunger in India.">
+  <meta name="keywords" content="food donation, surplus food, NGO, India, wedding food donation, reduce food waste, Annadata">
+  <meta name="theme-color" content="#FF6B35">
+  <link rel="manifest" href="manifest.json">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <style>
+    /* ==========================================
+       CSS CUSTOM PROPERTIES / DESIGN TOKENS
+       ========================================== */
+    :root {
+      --saffron: #FF6B35;
+      --saffron-dark: #E55A2B;
+      --saffron-light: #FF8F66;
+      --gold: #F7931E;
+      --gold-light: #FFAD4D;
+      --green: #2E8B57;
+      --green-light: #3DA86D;
+      --cream: #FFF8F0;
+      --cream-dark: #F5EDDF;
+      --brown: #5C3317;
+      --brown-light: #7A4A2A;
+      --navy: #1A1A2E;
+      --navy-light: #2D2D44;
+      --white: #FFFFFF;
+      --black: #111111;
+
+      --bg-primary: var(--cream);
+      --bg-secondary: var(--white);
+      --bg-dark: var(--navy);
+      --text-primary: var(--brown);
+      --text-secondary: var(--brown-light);
+      --text-inverse: var(--cream);
+      --card-bg: var(--white);
+      --card-shadow: rgba(92, 51, 23, 0.08);
+      --glass-bg: rgba(255, 248, 240, 0.72);
+      --glass-border: rgba(255, 107, 53, 0.18);
+
+      --font-heading: 'Playfair Display', Georgia, serif;
+      --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+      --radius-sm: 8px;
+      --radius-md: 16px;
+      --radius-lg: 24px;
+      --radius-xl: 32px;
+      --radius-full: 9999px;
+
+      --shadow-sm: 0 2px 8px rgba(92, 51, 23, 0.06);
+      --shadow-md: 0 8px 32px rgba(92, 51, 23, 0.10);
+      --shadow-lg: 0 16px 64px rgba(92, 51, 23, 0.14);
+      --shadow-glow: 0 0 40px rgba(255, 107, 53, 0.20);
+
+      --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-base: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-slow: 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Dark Mode */
+    [data-theme="dark"] {
+      --bg-primary: #0F0F1A;
+      --bg-secondary: #16162A;
+      --text-primary: #E8DDD0;
+      --text-secondary: #B8A99A;
+      --text-inverse: var(--navy);
+      --card-bg: #1E1E36;
+      --card-shadow: rgba(0, 0, 0, 0.3);
+      --glass-bg: rgba(26, 26, 46, 0.80);
+      --glass-border: rgba(255, 107, 53, 0.25);
+    }
+
+    /* ==========================================
+       RESET & BASE STYLES
+       ========================================== */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      font-size: 16px;
+      overflow-x: hidden;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.7;
+      overflow-x: hidden;
+      transition: background var(--transition-slow), color var(--transition-slow);
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    img {
+      max-width: 100%;
+      display: block;
+    }
+
+    button {
+      font-family: var(--font-body);
+      cursor: pointer;
+      border: none;
+      outline: none;
+    }
+
+    input, textarea, select {
+      font-family: var(--font-body);
+      outline: none;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg-primary); }
+    ::-webkit-scrollbar-thumb {
+      background: var(--saffron);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover { background: var(--saffron-dark); }
+
+    /* ==========================================
+       LOADING SCREEN
+       ========================================== */
+    #loading-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      background: var(--cream);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.8s ease, visibility 0.8s ease;
+    }
+
+    #loading-screen.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    [data-theme="dark"] #loading-screen {
+      background: #0F0F1A;
+    }
+
+    .loader-logo {
+      font-family: var(--font-heading);
+      font-size: 3rem;
+      font-weight: 800;
+      color: var(--saffron);
+      margin-bottom: 2rem;
+      opacity: 0;
+      animation: loaderFadeIn 0.8s ease forwards;
+    }
+
+    .loader-logo span {
+      color: var(--gold);
+    }
+
+    .loader-plate {
+      width: 120px;
+      height: 120px;
+      position: relative;
+      margin-bottom: 2rem;
+    }
+
+    .plate-circle {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 4px solid var(--saffron);
+      position: absolute;
+      top: 0;
+      left: 0;
+      animation: plateRotate 2s linear infinite;
+    }
+
+    .plate-inner {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold), var(--saffron));
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      overflow: hidden;
+    }
+
+    .food-fill {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: linear-gradient(to top, var(--green), var(--green-light));
+      border-radius: 0 0 50% 50%;
+      animation: fillPlate 2.5s ease-in-out infinite;
+    }
+
+    .plate-steam {
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 8px;
+    }
+
+    .steam-line {
+      width: 3px;
+      height: 20px;
+      background: var(--saffron-light);
+      border-radius: 3px;
+      opacity: 0;
+      animation: steamRise 1.5s ease-in-out infinite;
+    }
+
+    .steam-line:nth-child(2) { animation-delay: 0.3s; height: 25px; }
+    .steam-line:nth-child(3) { animation-delay: 0.6s; height: 18px; }
+
+    .loader-text {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      animation: loaderPulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes loaderFadeIn {
+      to { opacity: 1; }
+    }
+
+    @keyframes plateRotate {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes fillPlate {
+      0%, 100% { height: 10%; }
+      50% { height: 85%; }
+    }
+
+    @keyframes steamRise {
+      0% { opacity: 0; transform: translateY(5px) scaleY(0.5); }
+      50% { opacity: 0.7; transform: translateY(-10px) scaleY(1); }
+      100% { opacity: 0; transform: translateY(-25px) scaleY(0.5); }
+    }
+
+    @keyframes loaderPulse {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
+
+    /* ==========================================
+       ANIMATED BACKGROUND GRADIENT
+       ========================================== */
+    .bg-gradient-animated {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background: linear-gradient(
+        135deg,
+        var(--bg-primary) 0%,
+        rgba(255, 107, 53, 0.03) 25%,
+        var(--bg-primary) 50%,
+        rgba(247, 147, 30, 0.03) 75%,
+        var(--bg-primary) 100%
+      );
+      background-size: 400% 400%;
+      animation: gradientShift 15s ease infinite;
+    }
+
+    [data-theme="dark"] .bg-gradient-animated {
+      background: linear-gradient(
+        135deg,
+        #0F0F1A 0%,
+        rgba(255, 107, 53, 0.05) 25%,
+        #0F0F1A 50%,
+        rgba(247, 147, 30, 0.04) 75%,
+        #0F0F1A 100%
+      );
+      background-size: 400% 400%;
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* ==========================================
+       NAVBAR
+       ========================================== */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--glass-border);
+      transition: all var(--transition-base);
+    }
+
+    .navbar.scrolled {
+      padding: 0.6rem 2rem;
+      box-shadow: var(--shadow-md);
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .nav-brand-icon {
+      width: 42px;
+      height: 42px;
+      background: linear-gradient(135deg, var(--saffron), var(--gold));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      transition: transform var(--transition-base);
+    }
+
+    .nav-brand:hover .nav-brand-icon {
+      transform: rotate(20deg) scale(1.1);
+    }
+
+    .nav-brand-text {
+      font-family: var(--font-heading);
+      font-size: 1.6rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--saffron), var(--gold));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-weight: 500;
+      font-size: 0.95rem;
+      color: var(--text-primary);
+      position: relative;
+      padding: 0.3rem 0;
+      transition: color var(--transition-fast);
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--saffron);
+      border-radius: 2px;
+      transition: width var(--transition-base);
+    }
+
+    .nav-links a:hover {
+      color: var(--saffron);
+    }
+
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.7rem 1.6rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+      border-radius: var(--radius-full);
+      transition: all var(--transition-base);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
+      opacity: 0;
+      transition: opacity var(--transition-fast);
+    }
+
+    .btn:hover::before {
+      opacity: 1;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--saffron), var(--saffron-dark));
+      color: var(--white);
+      box-shadow: 0 4px 20px rgba(255, 107, 53, 0.35);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(255, 107, 53, 0.45);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--saffron);
+      border: 2px solid var(--saffron);
+    }
+
+    .btn-secondary:hover {
+      background: var(--saffron);
+      color: var(--white);
+      transform: translateY(-2px);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-primary);
+      padding: 0.5rem;
+      border-radius: var(--radius-sm);
+    }
+
+    .btn-ghost:hover {
+      background: rgba(255, 107, 53, 0.08);
+      color: var(--saffron);
+    }
+
+    .theme-toggle, .lang-toggle {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-sm);
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      transition: all var(--transition-fast);
+      color: var(--text-primary);
+    }
+
+    .theme-toggle:hover, .lang-toggle:hover {
+      background: rgba(255, 107, 53, 0.1);
+      color: var(--saffron);
+    }
+
+    .mobile-menu-btn {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      background: transparent;
+      padding: 0.5rem;
+    }
+
+    .mobile-menu-btn span {
+      width: 24px;
+      height: 2px;
+      background: var(--text-primary);
+      border-radius: 2px;
+      transition: all var(--transition-base);
+    }
+
+    .mobile-menu-btn.active span:nth-child(1) {
+      transform: rotate(45deg) translate(5px, 5px);
+    }
+
+    .mobile-menu-btn.active span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .mobile-menu-btn.active span:nth-child(3) {
+      transform: rotate(-45deg) translate(5px, -5px);
+    }
+
+    /* ==========================================
+       HERO SECTION
+       ========================================== */
+    .hero {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      min-height: 700px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    #hero-canvas {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+    }
+
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        180deg,
+        rgba(255, 248, 240, 0.1) 0%,
+        rgba(255, 248, 240, 0.4) 40%,
+        rgba(255, 248, 240, 0.85) 100%
+      );
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    [data-theme="dark"] .hero-overlay {
+      background: linear-gradient(
+        180deg,
+        rgba(15, 15, 26, 0.1) 0%,
+        rgba(15, 15, 26, 0.5) 40%,
+        rgba(15, 15, 26, 0.9) 100%
+      );
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      max-width: 900px;
+      padding: 0 2rem;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1.2rem;
+      background: rgba(255, 107, 53, 0.1);
+      border: 1px solid rgba(255, 107, 53, 0.2);
+      border-radius: var(--radius-full);
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--saffron);
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .hero-badge .pulse-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--green);
+      border-radius: 50%;
+      animation: pulseDot 2s ease-in-out infinite;
+    }
+
+    @keyframes pulseDot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.5); }
+    }
+
+    .hero-title {
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 0.5rem;
+      opacity: 0;
+      transform: translateY(30px);
+    }
+
+    .hero-title .highlight {
+      background: linear-gradient(135deg, var(--saffron), var(--gold));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-subtitle {
+      font-family: var(--font-heading);
+      font-size: clamp(1.1rem, 2.5vw, 1.6rem);
+      font-weight: 400;
+      font-style: italic;
+      color: var(--text-secondary);
+      margin-bottom: 1rem;
+      opacity: 0;
+      transform: translateY(30px);
+    }
+
+    .hero-desc {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin: 0 auto 2.5rem;
+      opacity: 0;
+      transform: translateY(30px);
+    }
+
+    .hero-ctas {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      opacity: 0;
+      transform: translateY(30px);
+    }
+
+    .hero-ctas .btn {
+      padding: 1rem 2rem;
+      font-size: 1rem;
+    }
+
+    .hero-scroll-hint {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      opacity: 0;
+      animation: scrollHintAppear 1s ease 3s forwards;
+    }
+
+    .scroll-mouse {
+      width: 24px;
+      height: 38px;
+      border: 2px solid var(--text-secondary);
+      border-radius: 12px;
+      position: relative;
+    }
+
+    .scroll-mouse::after {
+      content: '';
+      position: absolute;
+      top: 6px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 4px;
+      height: 8px;
+      background: var(--saffron);
+      border-radius: 2px;
+      animation: scrollWheel 2s ease infinite;
+    }
+
+    @keyframes scrollWheel {
+      0% { transform: translateX(-50%) translateY(0); opacity: 1; }
+      100% { transform: translateX(-50%) translateY(14px); opacity: 0; }
+    }
+
+    @keyframes scrollHintAppear {
+      to { opacity: 0.6; }
+    }
+
+    /* ==========================================
+       SECTION COMMON
+       ========================================== */
+    .section {
+      padding: 6rem 2rem;
+      position: relative;
+    }
+
+    .section-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 4rem;
+    }
+
+    .section-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--saffron);
+      margin-bottom: 1rem;
+    }
+
+    .section-label::before,
+    .section-label::after {
+      content: '';
+      width: 30px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--saffron));
+      border-radius: 2px;
+    }
+
+    .section-label::after {
+      background: linear-gradient(90deg, var(--saffron), transparent);
+    }
+
+    .section-title {
+      font-size: clamp(2rem, 4vw, 3rem);
+      margin-bottom: 1rem;
+    }
+
+    .section-desc {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      max-width: 650px;
+      margin: 0 auto;
+    }
+
+    /* ==========================================
+       IMPACT COUNTER SECTION
+       ========================================== */
+    .impact-section {
+      background: linear-gradient(135deg, var(--navy), var(--navy-light));
+      color: var(--cream);
+      overflow: hidden;
+    }
+
+    [data-theme="dark"] .impact-section {
+      background: linear-gradient(135deg, #12121F, #1E1E36);
+      border-top: 1px solid rgba(255, 107, 53, 0.1);
+      border-bottom: 1px solid rgba(255, 107, 53, 0.1);
+    }
+
+    .impact-section .section-label {
+      color: var(--gold);
+    }
+
+    .impact-section .section-title {
+      color: var(--cream);
+    }
+
+    .impact-section .section-desc {
+      color: rgba(255, 248, 240, 0.7);
+    }
+
+    .impact-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2rem;
+    }
+
+    .impact-card {
+      text-align: center;
+      padding: 2.5rem 1.5rem;
+      border-radius: var(--radius-lg);
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all var(--transition-base);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .impact-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 3px;
+      background: linear-gradient(90deg, var(--saffron), var(--gold));
+      border-radius: 0 0 3px 3px;
+    }
+
+    .impact-card:hover {
+      background: rgba(255, 255, 255, 0.08);
+      transform: translateY(-5px);
+      border-color: rgba(255, 107, 53, 0.3);
+    }
+
+    .impact-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .impact-number {
+      font-family: var(--font-heading);
+      font-size: 3rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--saffron), var(--gold));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.5rem;
+    }
+
+    .impact-label {
+      font-size: 0.95rem;
+      color: rgba(255, 248, 240, 0.7);
+      font-weight: 500;
+    }
+
+    /* ==========================================
+       HOW IT WORKS SECTION
+       ========================================== */
+    .how-it-works-section {
+      background: var(--bg-primary);
+    }
+
+    .steps-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 3rem;
+      position: relative;
+    }
+
+    .steps-container::before {
+      content: '';
+      position: absolute;
+      top: 80px;
+      left: 16.67%;
+      right: 16.67%;
+      height: 3px;
+      background: linear-gradient(90deg, var(--saffron), var(--gold), var(--green));
+      border-radius: 3px;
+      z-index: 0;
+    }
+
+    .step-card {
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .step-icon-wrap {
+      width: 160px;
+      height: 160px;
+      margin: 0 auto 2rem;
+      position: relative;
+    }
+
+    .step-icon-bg {
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(255, 107, 53, 0.08), rgba(247, 147, 30, 0.08));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--transition-base);
+    }
+
+    .step-card:hover .step-icon-bg {
+      background: linear-gradient(135deg, rgba(255, 107, 53, 0.15), rgba(247, 147, 30, 0.15));
+      transform: scale(1.05);
+    }
+
+    .step-icon {
+      font-size: 4rem;
+    }
+
+    .step-number {
+      position: absolute;
+      top: -5px;
+      right: 10px;
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--saffron), var(--gold));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--white);
+      box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4);
+    }
+
+    .step-title {
+      font-size: 1.4rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .step-desc {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      max-width: 300px;
+      margin: 0 auto;
+    }
+
+    /* ==========================================
+       TESTIMONIALS SECTION
+       ========================================== */
+    .testimonials-section {
+      background: var(--bg-secondary);
+    }
+
+    [data-theme="dark"] .testimonials-section {
+      background: var(--bg-secondary);
+    }
+
+    .testimonials-carousel {
+      position: relative;
+      max-width: 800px;
+      margin: 0 auto;
+      overflow: hidden;
+    }
+
+    .testimonials-track {
+      display: flex;
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .testimonial-card {
+      min-width: 100%;
+      padding: 3rem;
+      text-align: center;
+    }
+
+    .testimonial-quote {
+      font-family: var(--font-heading);
+      font-size: 1.4rem;
+      font-style: italic;
+      line-height: 1.8;
+      margin-bottom: 2rem;
+      position: relative;
+      color: var(--text-primary);
+    }
+
+    .testimonial-quote::before {
+      content: '"';
+      font-size: 5rem;
+      font-family: var(--font-heading);
+      color: var(--saffron);
+      opacity: 0.2;
+      position: absolute;
+      top: -2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      line-height: 1;
+    }
+
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+    }
+
+    .testimonial-avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--saffron), var(--gold));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--white);
+    }
+
+    .testimonial-name {
+      font-weight: 600;
+      font-size: 1rem;
+    }
+
+    .testimonial-role {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    .carousel-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .carousel-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--card-bg);
+      border: 1px solid var(--glass-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      color: var(--text-primary);
+      transition: all var(--transition-fast);
+    }
+
+    .carousel-btn:hover {
+      background: var(--saffron);
+      color: var(--white);
+      border-color: var(--saffron);
+    }
+
+    .carousel-dots {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .carousel-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(255, 107, 53, 0.2);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .carousel-dot.active {
+      background: var(--saffron);
+      width: 30px;
+      border-radius: 5px;
+    }
+
+    /* ==========================================
+       MAP SECTION
+       ========================================== */
+    .map-section {
+      background: var(--bg-primary);
+    }
+
+    .map-wrapper {
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--glass-border);
+      position: relative;
+    }
+
+    #donation-map {
+      width: 100%;
+      height: 500px;
+    }
+
+    .map-overlay-info {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      z-index: 999;
+      background: var(--glass-bg);
+      backdrop-filter: blur(15px);
+      padding: 1rem 1.5rem;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--glass-border);
+      max-width: 240px;
+    }
+
+    .map-overlay-info h4 {
+      font-size: 0.9rem;
+      margin-bottom: 0.3rem;
+      color: var(--saffron);
+    }
+
+    .map-overlay-info p {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    /* ==========================================
+       CTA SECTION
+       ========================================== */
+    .cta-section {
+      background: linear-gradient(135deg, var(--saffron), var(--saffron-dark));
+      color: var(--white);
+      text-align: center;
+    }
+
+    .cta-section .section-label {
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .cta-section .section-label::before,
+    .cta-section .section-label::after {
+      background: rgba(255, 255, 255, 0.4);
+    }
+
+    .cta-section .section-title {
+      color: var(--white);
+    }
+
+    .cta-section .section-desc {
+      color: rgba(255, 255, 255, 0.85);
+    }
+
+    .cta-buttons {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-top: 2.5rem;
+    }
+
+    .cta-buttons .btn-white {
+      background: var(--white);
+      color: var(--saffron-dark);
+      padding: 1rem 2.5rem;
+      font-size: 1rem;
+      border-radius: var(--radius-full);
+      font-weight: 700;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      transition: all var(--transition-base);
+    }
+
+    .cta-buttons .btn-white:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .cta-buttons .btn-outline-white {
+      background: transparent;
+      color: var(--white);
+      padding: 1rem 2.5rem;
+      font-size: 1rem;
+      border-radius: var(--radius-full);
+      font-weight: 600;
+      border: 2px solid rgba(255, 255, 255, 0.5);
+      transition: all var(--transition-base);
+    }
+
+    .cta-buttons .btn-outline-white:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: var(--white);
+      transform: translateY(-3px);
+    }
+
+    /* ==========================================
+       FOOTER
+       ========================================== */
+    .footer {
+      background: var(--navy);
+      color: rgba(255, 248, 240, 0.8);
+      padding: 5rem 2rem 2rem;
+    }
+
+    [data-theme="dark"] .footer {
+      background: #0A0A14;
+    }
+
+    .footer-grid {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 3rem;
+      margin-bottom: 3rem;
+    }
+
+    .footer-brand-text {
+      font-family: var(--font-heading);
+      font-size: 1.8rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--saffron), var(--gold));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 1rem;
+    }
+
+    .footer-desc {
+      font-size: 0.9rem;
+      line-height: 1.8;
+      margin-bottom: 1.5rem;
+      color: rgba(255, 248, 240, 0.6);
+    }
+
+    .footer-socials {
+      display: flex;
+      gap: 0.8rem;
+    }
+
+    .footer-social-link {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-sm);
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      transition: all var(--transition-fast);
+    }
+
+    .footer-social-link:hover {
+      background: var(--saffron);
+      border-color: var(--saffron);
+      transform: translateY(-3px);
+    }
+
+    .footer-col h4 {
+      font-family: var(--font-heading);
+      font-size: 1.1rem;
+      color: var(--cream);
+      margin-bottom: 1.5rem;
+    }
+
+    .footer-col ul {
+      list-style: none;
+    }
+
+    .footer-col li {
+      margin-bottom: 0.8rem;
+    }
+
+    .footer-col a {
+      font-size: 0.9rem;
+      color: rgba(255, 248, 240, 0.6);
+      transition: color var(--transition-fast);
+    }
+
+    .footer-col a:hover {
+      color: var(--saffron);
+    }
+
+    .footer-bottom {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding-top: 2rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .footer-bottom p {
+      font-size: 0.85rem;
+      color: rgba(255, 248, 240, 0.4);
+    }
+
+    .footer-tagline {
+      font-family: var(--font-heading);
+      font-style: italic;
+      color: var(--gold) !important;
+      font-size: 0.95rem !important;
+    }
+
+    /* ==========================================
+       AI CHATBOT
+       ========================================== */
+    .chatbot-bubble {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      z-index: 900;
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--saffron), var(--gold));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      color: var(--white);
+      cursor: pointer;
+      box-shadow: 0 6px 30px rgba(255, 107, 53, 0.4);
+      transition: all var(--transition-base);
+      animation: chatBubblePulse 3s ease-in-out infinite;
+    }
+
+    .chatbot-bubble:hover {
+      transform: scale(1.1);
+      box-shadow: 0 8px 40px rgba(255, 107, 53, 0.5);
+    }
+
+    .chatbot-bubble.active {
+      animation: none;
+      transform: rotate(180deg);
+    }
+
+    @keyframes chatBubblePulse {
+      0%, 100% { box-shadow: 0 6px 30px rgba(255, 107, 53, 0.4); }
+      50% { box-shadow: 0 6px 30px rgba(255, 107, 53, 0.6), 0 0 60px rgba(255, 107, 53, 0.2); }
+    }
+
+    .chatbot-window {
+      position: fixed;
+      bottom: 7rem;
+      right: 2rem;
+      z-index: 899;
+      width: 400px;
+      max-height: 550px;
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--glass-border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transform: scale(0.9) translateY(20px);
+      opacity: 0;
+      visibility: hidden;
+      transition: all var(--transition-base);
+    }
+
+    .chatbot-window.open {
+      transform: scale(1) translateY(0);
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .chatbot-header {
+      padding: 1.2rem 1.5rem;
+      background: linear-gradient(135deg, var(--saffron), var(--gold));
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .chatbot-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+    }
+
+    .chatbot-header-info h4 {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .chatbot-header-info p {
+      font-size: 0.75rem;
+      opacity: 0.8;
+    }
+
+    .chatbot-messages {
+      flex: 1;
+      padding: 1.5rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      max-height: 350px;
+      min-height: 250px;
+    }
+
+    .chat-message {
+      display: flex;
+      gap: 0.6rem;
+      align-items: flex-start;
+      animation: messageSlideIn 0.3s ease forwards;
+    }
+
+    .chat-message.user {
+      flex-direction: row-reverse;
+    }
+
+    .chat-msg-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--saffron), var(--gold));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      color: var(--white);
+      flex-shrink: 0;
+    }
+
+    .chat-message.user .chat-msg-avatar {
+      background: linear-gradient(135deg, var(--green), var(--green-light));
+    }
+
+    .chat-msg-bubble {
+      max-width: 80%;
+      padding: 0.8rem 1.1rem;
+      border-radius: var(--radius-md);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .chat-message:not(.user) .chat-msg-bubble {
+      background: rgba(255, 107, 53, 0.08);
+      color: var(--text-primary);
+      border-bottom-left-radius: 4px;
+    }
+
+    .chat-message.user .chat-msg-bubble {
+      background: linear-gradient(135deg, var(--saffron), var(--saffron-dark));
+      color: var(--white);
+      border-bottom-right-radius: 4px;
+    }
+
+    .chatbot-input-area {
+      padding: 1rem 1.5rem;
+      border-top: 1px solid var(--glass-border);
+      display: flex;
+      gap: 0.6rem;
+    }
+
+    .chatbot-input {
+      flex: 1;
+      padding: 0.7rem 1rem;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--glass-border);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-size: 0.9rem;
+      transition: border-color var(--transition-fast);
+    }
+
+    .chatbot-input:focus {
+      border-color: var(--saffron);
+    }
+
+    .chatbot-send-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--saffron), var(--gold));
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      transition: all var(--transition-fast);
+    }
+
+    .chatbot-send-btn:hover {
+      transform: scale(1.1);
+    }
+
+    .chatbot-send-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .typing-indicator {
+      display: flex;
+      gap: 4px;
+      padding: 0.5rem 0;
+    }
+
+    .typing-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--saffron);
+      opacity: 0.4;
+      animation: typingBounce 1.4s infinite;
+    }
+
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes typingBounce {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+      30% { transform: translateY(-6px); opacity: 1; }
+    }
+
+    @keyframes messageSlideIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ==========================================
+       3D CARD HOVER EFFECT
+       ========================================== */
+    .card-3d {
+      perspective: 1000px;
+      transform-style: preserve-3d;
+      transition: transform var(--transition-base);
+    }
+
+    .card-3d-inner {
+      transition: transform var(--transition-base), box-shadow var(--transition-base);
+      will-change: transform;
+    }
+
+    /* ==========================================
+       MOBILE RESPONSIVE
+       ========================================== */
+    @media (max-width: 1024px) {
+      .impact-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .steps-container {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+
+      .steps-container::before {
+        display: none;
+      }
+
+      .footer-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: var(--glass-bg);
+        backdrop-filter: blur(20px);
+        padding: 1.5rem 2rem;
+        flex-direction: column;
+        gap: 1rem;
+        border-bottom: 1px solid var(--glass-border);
+      }
+
+      .nav-links.open {
+        display: flex;
+      }
+
+      .mobile-menu-btn {
+        display: flex;
+      }
+
+      .nav-actions .btn {
+        display: none;
+      }
+
+      .hero-title {
+        font-size: 2.2rem;
+      }
+
+      .hero-ctas {
+        flex-direction: column;
+      }
+
+      .hero-ctas .btn {
+        width: 100%;
+      }
+
+      .impact-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+      }
+
+      .impact-number {
+        font-size: 2.2rem;
+      }
+
+      .footer-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .chatbot-window {
+        right: 1rem;
+        left: 1rem;
+        width: auto;
+        bottom: 6rem;
+        max-height: 70vh;
+      }
+
+      .chatbot-bubble {
+        bottom: 1.5rem;
+        right: 1.5rem;
+        width: 56px;
+        height: 56px;
+      }
+
+      #donation-map {
+        height: 350px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .impact-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .section {
+        padding: 4rem 1.2rem;
+      }
+
+      .navbar {
+        padding: 0.8rem 1rem;
+      }
+    }
+
+    /* ==========================================
+       UTILITY & ANIMATION
+       ========================================== */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0,0,0,0);
+      white-space: nowrap;
+      border: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== LOADING SCREEN ===== -->
+  <div id="loading-screen" role="status" aria-label="Loading Annadata">
+    <div class="loader-logo">Anna<span>data</span></div>
+    <div class="loader-plate">
+      <div class="plate-circle"></div>
+      <div class="plate-inner">
+        <div class="food-fill"></div>
+      </div>
+      <div class="plate-steam">
+        <div class="steam-line"></div>
+        <div class="steam-line"></div>
+        <div class="steam-line"></div>
+      </div>
+    </div>
+    <p class="loader-text" data-en="Serving Kindness..." data-hi="दया परोस रहे हैं...">Serving Kindness...</p>
+  </div>
+
+  <!-- ===== ANIMATED BACKGROUND ===== -->
+  <div class="bg-gradient-animated" aria-hidden="true"></div>
+
+  <!-- ===== NAVBAR ===== -->
+  <nav class="navbar" id="navbar" role="navigation" aria-label="Main navigation">
+    <a href="#" class="nav-brand" aria-label="Annadata Home">
+      <div class="nav-brand-icon" aria-hidden="true">🙏</div>
+      <span class="nav-brand-text">Annadata</span>
+    </a>
+
+    <ul class="nav-links" id="nav-links" role="menubar">
+      <li role="none"><a href="#impact" role="menuitem" data-en="Impact" data-hi="प्रभाव">Impact</a></li>
+      <li role="none"><a href="#how-it-works" role="menuitem" data-en="How it Works" data-hi="कैसे काम करता है">How it Works</a></li>
+      <li role="none"><a href="#stories" role="menuitem" data-en="Stories" data-hi="कहानियाँ">Stories</a></li>
+      <li role="none"><a href="#map" role="menuitem" data-en="Live Map" data-hi="लाइव मैप">Live Map</a></li>
+      <li role="none"><a href="#join" role="menuitem" data-en="Join Us" data-hi="जुड़ें">Join Us</a></li>
+    </ul>
+
+    <div class="nav-actions">
+      <button class="lang-toggle" id="lang-toggle" aria-label="Toggle Hindi/English" title="हिंदी/English">
+        अ
+      </button>
+      <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark/light mode">
+        🌙
+      </button>
+      <a href="#join" class="btn btn-primary" data-en="Join as Organizer" data-hi="आयोजक बनें">Join as Organizer</a>
+      <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Toggle menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ===== HERO SECTION ===== -->
+  <section class="hero" id="hero" aria-label="Hero section">
+    <canvas id="hero-canvas" aria-hidden="true"></canvas>
+    <div class="hero-overlay" aria-hidden="true"></div>
+
+    <div class="hero-content">
+      <div class="hero-badge" id="hero-badge">
+        <span class="pulse-dot"></span>
+        <span data-en="Live — 23 food donations happening now" data-hi="लाइव — अभी 23 खाना दान हो रहे हैं">Live — 23 food donations happening now</span>
+      </div>
+
+      <h1 class="hero-title" id="hero-title">
+        <span data-en="Ek Daawat," data-hi="एक दावत,">Ek Daawat,</span><br>
+        <span class="highlight" data-en="Hazaron Zindagiyaan" data-hi="हज़ारों ज़िंदगियाँ">Hazaron Zindagiyaan</span>
+      </h1>
+
+      <p class="hero-subtitle" id="hero-subtitle" data-en="One Feast, Thousand Lives" data-hi="एक भोज, हज़ार जीवन">One Feast, Thousand Lives</p>
+
+      <p class="hero-desc" id="hero-desc" data-en="Connect surplus wedding & event food with NGOs who deliver it to those who need it most. No food wasted, no stomach empty." data-hi="शादी और इवेंट के बचे खाने को NGO से जोड़ें जो इसे ज़रूरतमंदों तक पहुँचाएँ। कोई खाना बर्बाद नहीं, कोई पेट खाली नहीं।">
+        Connect surplus wedding & event food with NGOs who deliver it to those who need it most. No food wasted, no stomach empty.
+      </p>
+
+      <div class="hero-ctas" id="hero-ctas">
+        <a href="#join" class="btn btn-primary" data-en="🍽️ I Have Food to Donate" data-hi="🍽️ मेरे पास खाना है दान करने को">🍽️ I Have Food to Donate</a>
+        <a href="#join" class="btn btn-secondary" data-en="🤝 I'm an NGO" data-hi="🤝 मैं एक NGO हूँ">🤝 I'm an NGO</a>
+      </div>
+    </div>
+
+    <div class="hero-scroll-hint" aria-hidden="true">
+      <div class="scroll-mouse"></div>
+      <span data-en="Scroll to explore" data-hi="स्क्रॉल करें">Scroll to explore</span>
+    </div>
+  </section>
+
+  <!-- ===== IMPACT COUNTER SECTION ===== -->
+  <section class="section impact-section" id="impact" aria-label="Impact statistics">
+    <div class="section-container">
+      <div class="section-header reveal">
+        <span class="section-label" data-en="Our Impact" data-hi="हमारा प्रभाव">Our Impact</span>
+        <h2 class="section-title" data-en="Every Number Tells a Story of Hope" data-hi="हर अंक उम्मीद की कहानी कहता है">Every Number Tells a Story of Hope</h2>
+        <p class="section-desc" data-en="Real impact, real lives changed. These numbers grow every single day." data-hi="असली प्रभाव, बदलते जीवन। ये संख्या हर दिन बढ़ रही है।">Real impact, real lives changed. These numbers grow every single day.</p>
+      </div>
+
+      <div class="impact-grid">
+        <div class="impact-card card-3d reveal" data-delay="0">
+          <div class="card-3d-inner">
+            <div class="impact-icon" aria-hidden="true">🍛</div>
+            <div class="impact-number" data-target="50000" data-suffix="+">0</div>
+            <div class="impact-label" data-en="Meals Saved" data-hi="भोजन बचाए गए">Meals Saved</div>
+          </div>
+        </div>
+        <div class="impact-card card-3d reveal" data-delay="100">
+          <div class="card-3d-inner">
+            <div class="impact-icon" aria-hidden="true">🏢</div>
+            <div class="impact-number" data-target="1200" data-suffix="+">0</div>
+            <div class="impact-label" data-en="NGOs Registered" data-hi="NGO पंजीकृत">NGOs Registered</div>
+          </div>
+        </div>
+        <div class="impact-card card-3d reveal" data-delay="200">
+          <div class="card-3d-inner">
+            <div class="impact-icon" aria-hidden="true">🎉</div>
+            <div class="impact-number" data-target="800" data-suffix="+">0</div>
+            <div class="impact-label" data-en="Events Connected" data-hi="इवेंट जुड़े">Events Connected</div>
+          </div>
+        </div>
+        <div class="impact-card card-3d reveal" data-delay="300">
+          <div class="card-3d-inner">
+            <div class="impact-icon" aria-hidden="true">🌱</div>
+            <div class="impact-number" data-target="12500" data-suffix=" kg">0</div>
+            <div class="impact-label" data-en="CO₂ Prevented" data-hi="CO₂ रोका गया">CO₂ Prevented</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== HOW IT WORKS SECTION ===== -->
+  <section class="section how-it-works-section" id="how-it-works" aria-label="How it works">
+    <div class="section-container">
+      <div class="section-header reveal">
+        <span class="section-label" data-en="How It Works" data-hi="कैसे काम करता है">How It Works</span>
+        <h2 class="section-title" data-en="Three Simple Steps to Save Lives" data-hi="तीन आसान कदम जीवन बचाने के लिए">Three Simple Steps to Save Lives</h2>
+        <p class="section-desc" data-en="From leftover feast to a life-saving meal — in under 60 minutes." data-hi="बचे हुए भोजन से जीवन रक्षक खाने तक — 60 मिनट में।">From leftover feast to a life-saving meal — in under 60 minutes.</p>
+      </div>
+
+      <div class="steps-container">
+        <div class="step-card card-3d reveal" data-delay="0">
+          <div class="card-3d-inner">
+            <div class="step-icon-wrap">
+              <div class="step-icon-bg">
+                <span class="step-icon" aria-hidden="true">📋</span>
+              </div>
+              <span class="step-number">1</span>
+            </div>
+            <h3 class="step-title" data-en="List Your Surplus" data-hi="अपना बचा खाना सूचीबद्ध करें">List Your Surplus</h3>
+            <p class="step-desc" data-en="Event organizer posts surplus food details — type, quantity, pickup time, and location." data-hi="इवेंट आयोजक बचे खाने की जानकारी देता है — प्रकार, मात्रा, पिकअप समय और स्थान।">Event organizer posts surplus food details — type, quantity, pickup time, and location.</p>
+          </div>
+        </div>
+        <div class="step-card card-3d reveal" data-delay="200">
+          <div class="card-3d-inner">
+            <div class="step-icon-wrap">
+              <div class="step-icon-bg">
+                <span class="step-icon" aria-hidden="true">🔔</span>
+              </div>
+              <span class="step-number">2</span>
+            </div>
+            <h3 class="step-title" data-en="NGOs Get Notified" data-hi="NGO को सूचना मिलती है">NGOs Get Notified</h3>
+            <p class="step-desc" data-en="Nearby registered NGOs receive instant alerts and can claim the food donation in one tap." data-hi="पास के पंजीकृत NGO को तुरंत अलर्ट मिलता है और वे एक टैप में दान ले सकते हैं।">Nearby registered NGOs receive instant alerts and can claim the food donation in one tap.</p>
+          </div>
+        </div>
+        <div class="step-card card-3d reveal" data-delay="400">
+          <div class="card-3d-inner">
+            <div class="step-icon-wrap">
+              <div class="step-icon-bg">
+                <span class="step-icon" aria-hidden="true">💝</span>
+              </div>
+              <span class="step-number">3</span>
+            </div>
+            <h3 class="step-title" data-en="Food Reaches the Needy" data-hi="खाना ज़रूरतमंदों तक पहुँचता है">Food Reaches the Needy</h3>
+            <p class="step-desc" data-en="NGO picks up and distributes the food to shelters, streets, and communities in need." data-hi="NGO खाना लेकर आश्रयों, सड़कों और ज़रूरतमंद समुदायों तक पहुँचाता है।">NGO picks up and distributes the food to shelters, streets, and communities in need.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== TESTIMONIALS SECTION ===== -->
+  <section class="section testimonials-section" id="stories" aria-label="Testimonials">
+    <div class="section-container">
+      <div class="section-header reveal">
+        <span class="section-label" data-en="Stories of Change" data-hi="बदलाव की कहानियाँ">Stories of Change</span>
+        <h2 class="section-title" data-en="Voices from the Heart" data-hi="दिल की आवाज़ें">Voices from the Heart</h2>
+        <p class="section-desc" data-en="Real people sharing how Annadata changed their world." data-hi="असली लोग बता रहे हैं कि अन्नदाता ने उनकी दुनिया कैसे बदली।">Real people sharing how Annadata changed their world.</p>
+      </div>
+
+      <div class="testimonials-carousel reveal" id="testimonials-carousel">
+        <div class="testimonials-track" id="testimonials-track">
+          <div class="testimonial-card">
+            <p class="testimonial-quote" data-en="After my daughter's wedding, we had food for 500 people left over. Through Annadata, an NGO picked it all up within 40 minutes. That night, 500 families ate a wedding feast. Nothing was wasted." data-hi="मेरी बेटी की शादी के बाद 500 लोगों का खाना बच गया था। अन्नदाता से एक NGO ने 40 मिनट में सब उठा लिया। उस रात 500 परिवारों ने शादी का खाना खाया। कुछ भी बर्बाद नहीं हुआ।">
+              After my daughter's wedding, we had food for 500 people left over. Through Annadata, an NGO picked it all up within 40 minutes. That night, 500 families ate a wedding feast. Nothing was wasted.
+            </p>
+            <div class="testimonial-author">
+              <div class="testimonial-avatar">RS</div>
+              <div>
+                <div class="testimonial-name">Rajesh Sharma</div>
+                <div class="testimonial-role" data-en="Event Organizer, Delhi" data-hi="इवेंट आयोजक, दिल्ली">Event Organizer, Delhi</div>
+              </div>
+            </div>
+          </div>
+          <div class="testimonial-card">
+            <p class="testimonial-quote" data-en="We used to struggle finding food for our shelter. Since joining Annadata, we receive 3-4 notifications every week. Our children haven't slept hungry in months. This platform is a blessing." data-hi="हम अपने आश्रय के लिए खाना ढूंढने में परेशान होते थे। अन्नदाता से जुड़ने के बाद हमें हर हफ्ते 3-4 सूचनाएँ मिलती हैं। हमारे बच्चे महीनों से भूखे नहीं सोए। यह मंच एक वरदान है।">
+              We used to struggle finding food for our shelter. Since joining Annadata, we receive 3-4 notifications every week. Our children haven't slept hungry in months. This platform is a blessing.
+            </p>
+            <div class="testimonial-author">
+              <div class="testimonial-avatar">PD</div>
+              <div>
+                <div class="testimonial-name">Priya Deshmukh</div>
+                <div class="testimonial-role" data-en="NGO Director, Annapurna Foundation, Mumbai" data-hi="NGO निदेशक, अन्नपूर्णा फाउंडेशन, मुंबई">NGO Director, Annapurna Foundation, Mumbai</div>
+              </div>
+            </div>
+          </div>
+          <div class="testimonial-card">
+            <p class="testimonial-quote" data-en="As a caterer, I always felt terrible throwing away food after events. Annadata turned my guilt into purpose. Every event now ends with a donation, and I've saved over 8,000 meals so far." data-hi="एक केटरर के रूप में, इवेंट के बाद खाना फेंकना मुझे हमेशा बुरा लगता था। अन्नदाता ने मेरे अपराधबोध को उद्देश्य में बदल दिया। अब हर इवेंट दान के साथ समाप्त होता है, और मैंने अब तक 8,000 से अधिक भोजन बचाए हैं।">
+              As a caterer, I always felt terrible throwing away food after events. Annadata turned my guilt into purpose. Every event now ends with a donation, and I've saved over 8,000 meals so far.
+            </p>
+            <div class="testimonial-author">
+              <div class="testimonial-avatar">AK</div>
+              <div>
+                <div class="testimonial-name">Amit Kumar</div>
+                <div class="testimonial-role" data-en="Professional Caterer, Jaipur" data-hi="पेशेवर केटरर, जयपुर">Professional Caterer, Jaipur</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="carousel-controls">
+          <button class="carousel-btn" id="carousel-prev" aria-label="Previous testimonial">←</button>
+          <div class="carousel-dots" id="carousel-dots">
+            <button class="carousel-dot active" data-index="0" aria-label="Testimonial 1"></button>
+            <button class="carousel-dot" data-index="1" aria-label="Testimonial 2"></button>
+            <button class="carousel-dot" data-index="2" aria-label="Testimonial 3"></button>
+          </div>
+          <button class="carousel-btn" id="carousel-next" aria-label="Next testimonial">→</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== MAP SECTION ===== -->
+  <section class="section map-section" id="map" aria-label="Live donation map">
+    <div class="section-container">
+      <div class="section-header reveal">
+        <span class="section-label" data-en="Live Map" data-hi="लाइव मैप">Live Map</span>
+        <h2 class="section-title" data-en="Food Donations Happening Right Now" data-hi="अभी हो रहे खाना दान">Food Donations Happening Right Now</h2>
+        <p class="section-desc" data-en="See the wave of kindness spreading across India in real time." data-hi="भारत भर में फैल रही दयालुता की लहर को वास्तविक समय में देखें।">See the wave of kindness spreading across India in real time.</p>
+      </div>
+
+      <div class="map-wrapper reveal">
+        <div id="donation-map"></div>
+        <div class="map-overlay-info">
+          <h4 data-en="📍 Live Donations" data-hi="📍 लाइव दान">📍 Live Donations</h4>
+          <p data-en="Each pin shows an active or recent food donation. Click for details." data-hi="हर पिन एक सक्रिय या हालिया खाना दान दिखाता है। विवरण के लिए क्लिक करें।">Each pin shows an active or recent food donation. Click for details.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CTA SECTION ===== -->
+  <section class="section cta-section" id="join" aria-label="Call to action">
+    <div class="section-container">
+      <div class="section-header reveal">
+        <span class="section-label" data-en="Join the Movement" data-hi="आंदोलन से जुड़ें">Join the Movement</span>
+        <h2 class="section-title" data-en="No Food Should Go to Waste When Someone Sleeps Hungry" data-hi="कोई खाना बर्बाद न हो जब कोई भूखा सोता है">No Food Should Go to Waste When Someone Sleeps Hungry</h2>
+        <p class="section-desc" data-en="Whether you're hosting an event or running an NGO — you have the power to change lives tonight." data-hi="चाहे आप इवेंट कर रहे हों या NGO चला रहे हों — आपके पास आज रात जीवन बदलने की शक्ति है।">Whether you're hosting an event or running an NGO — you have the power to change lives tonight.</p>
+      </div>
+      <div class="cta-buttons reveal">
+        <button class="btn-white" data-en="🍽️ Donate Surplus Food" data-hi="🍽️ बचा खाना दान करें">🍽️ Donate Surplus Food</button>
+        <button class="btn-outline-white" data-en="🤝 Register as NGO" data-hi="🤝 NGO के रूप में पंजीकरण करें">🤝 Register as NGO</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer" role="contentinfo">
+    <div class="footer-grid">
+      <div class="footer-brand-col">
+        <div class="footer-brand-text">Annadata</div>
+        <p class="footer-desc" data-en="India's first platform connecting surplus event food with NGOs and communities in need. Because no meal should be wasted when someone goes hungry." data-hi="भारत का पहला मंच जो बचे इवेंट खाने को NGO और ज़रूरतमंद समुदायों से जोड़ता है। क्योंकि कोई भोजन बर्बाद नहीं होना चाहिए जब कोई भूखा है।">
+          India's first platform connecting surplus event food with NGOs and communities in need. Because no meal should be wasted when someone goes hungry.
+        </p>
+        <div class="footer-socials">
+          <a href="#" class="footer-social-link" aria-label="Twitter">𝕏</a>
+          <a href="#" class="footer-social-link" aria-label="Instagram">📷</a>
+          <a href="#" class="footer-social-link" aria-label="LinkedIn">in</a>
+          <a href="#" class="footer-social-link" aria-label="YouTube">▶</a>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h4 data-en="Platform" data-hi="प्लेटफ़ॉर्म">Platform</h4>
+        <ul>
+          <li><a href="#how-it-works" data-en="How it Works" data-hi="कैसे काम करता है">How it Works</a></li>
+          <li><a href="#" data-en="For Organizers" data-hi="आयोजकों के लिए">For Organizers</a></li>
+          <li><a href="#" data-en="For NGOs" data-hi="NGO के लिए">For NGOs</a></li>
+          <li><a href="#impact" data-en="Impact Report" data-hi="प्रभाव रिपोर्ट">Impact Report</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4 data-en="Resources" data-hi="संसाधन">Resources</h4>
+        <ul>
+          <li><a href="#" data-en="Food Safety Guide" data-hi="खाद्य सुरक्षा गाइड">Food Safety Guide</a></li>
+          <li><a href="#" data-en="Volunteer" data-hi="स्वयंसेवक बनें">Volunteer</a></li>
+          <li><a href="#" data-en="Blog" data-hi="ब्लॉग">Blog</a></li>
+          <li><a href="#" data-en="FAQs" data-hi="अक्सर पूछे जाने वाले सवाल">FAQs</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4 data-en="Contact" data-hi="संपर्क">Contact</h4>
+        <ul>
+          <li><a href="mailto:hello@annadata.org">hello@annadata.org</a></li>
+          <li><a href="tel:+911800123456">1800-123-456</a></li>
+          <li><a href="#" data-en="Partner with Us" data-hi="हमारे साथ भागीदार बनें">Partner with Us</a></li>
+          <li><a href="#" data-en="Press Kit" data-hi="प्रेस किट">Press Kit</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>© 2026 Annadata. <span data-en="Made with ❤️ for India." data-hi="भारत के लिए ❤️ से बनाया गया।">Made with ❤️ for India.</span></p>
+      <p class="footer-tagline" data-en="Together we can end hunger" data-hi="मिलकर हम भुखमरी मिटा सकते हैं">"Together we can end hunger"</p>
+    </div>
+  </footer>
+
+  <!-- ===== AI CHATBOT ===== -->
+  <button class="chatbot-bubble" id="chatbot-bubble" aria-label="Open Annapurna AI chat assistant" title="Chat with Annapurna AI">
+    💬
+  </button>
+
+  <div class="chatbot-window" id="chatbot-window" role="dialog" aria-label="Annapurna AI Chat" aria-hidden="true">
+    <div class="chatbot-header">
+      <div class="chatbot-avatar">🙏</div>
+      <div class="chatbot-header-info">
+        <h4>Annapurna AI</h4>
+        <p data-en="Your kind food donation assistant" data-hi="आपकी दयालु खाना दान सहायक">Your kind food donation assistant</p>
+      </div>
+    </div>
+
+    <div class="chatbot-messages" id="chatbot-messages">
+      <div class="chat-message">
+        <div class="chat-msg-avatar">🙏</div>
+        <div class="chat-msg-bubble" data-en="Namaste! 🙏 I'm Annapurna, your assistant on Annadata. I can help you donate surplus food, register as an NGO, or answer any questions about food safety and logistics. How can I help you today?" data-hi="नमस्ते! 🙏 मैं अन्नपूर्णा हूँ, अन्नदाता पर आपकी सहायक। मैं आपको बचा खाना दान करने, NGO के रूप में पंजीकरण करने, या खाद्य सुरक्षा और लॉजिस्टिक्स के बारे में किसी भी सवाल का जवाब देने में मदद कर सकती हूँ। आज मैं आपकी कैसे मदद कर सकती हूँ?">
+          Namaste! 🙏 I'm Annapurna, your assistant on Annadata. I can help you donate surplus food, register as an NGO, or answer any questions about food safety and logistics. How can I help you today?
+        </div>
+      </div>
+    </div>
+
+    <div class="chatbot-input-area">
+      <input
+        type="text"
+        class="chatbot-input"
+        id="chatbot-input"
+        placeholder="Type your message..."
+        data-placeholder-en="Type your message..."
+        data-placeholder-hi="अपना संदेश लिखें..."
+        aria-label="Chat message input"
+      >
+      <button class="chatbot-send-btn" id="chatbot-send" aria-label="Send message">➤</button>
+    </div>
+  </div>
+
+  <!-- ===== SCRIPTS ===== -->
+
+  <!-- Three.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <!-- GSAP + ScrollTrigger -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+  <!-- Leaflet.js -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <script>
+    (() => {
+      'use strict';
+
+      // =============================================
+      // CONFIGURATION
+      // =============================================
+      const CONFIG = {
+        ANTHROPIC_API_KEY: '', // Set your key here or via env
+        CHATBOT_MODEL: 'claude-opus-4-6',
+        CHATBOT_SYSTEM_PROMPT: `You are Annapurna, a kind AI assistant for the Annadata platform. Annadata connects wedding and event organizers who have surplus food with registered NGOs, who then distribute it to beggars and needy people across India.
+
+Help users understand how to donate surplus food, how NGOs can register, and answer questions about food safety, logistics, and reducing food wastage. Speak warmly and use simple Hindi-English mix (Hinglish) when appropriate.
+
+Key facts:
+- Organizers can list surplus food with details like food type, quantity, pickup window, and location.
+- NGOs get real-time notifications when food is listed near them.
+- NGOs claim food and pick it up within the given time window.
+- Food safety: We recommend food be consumed within 4-6 hours of preparation. Cold items need temperature control.
+- Annadata is free to use for everyone.
+- Over 50,000 meals have been saved, 1,200 NGOs are registered, and 800 events have been connected.
+
+Always be encouraging, empathetic, and helpful. End messages with warmth.`,
+      };
+
+      // =============================================
+      // LANGUAGE SYSTEM
+      // =============================================
+      let currentLang = 'en';
+
+      function toggleLanguage() {
+        currentLang = currentLang === 'en' ? 'hi' : 'en';
+        document.querySelectorAll('[data-en]').forEach(el => {
+          el.textContent = el.getAttribute(`data-${currentLang}`);
+        });
+        // Update placeholders
+        const chatInput = document.getElementById('chatbot-input');
+        if (chatInput) {
+          chatInput.placeholder = chatInput.getAttribute(`data-placeholder-${currentLang}`);
+        }
+        const langBtn = document.getElementById('lang-toggle');
+        langBtn.textContent = currentLang === 'en' ? 'अ' : 'EN';
+        langBtn.setAttribute('aria-label', currentLang === 'en' ? 'Switch to Hindi' : 'Switch to English');
+      }
+
+      // =============================================
+      // THEME SYSTEM
+      // =============================================
+      function toggleTheme() {
+        const html = document.documentElement;
+        const isDark = html.getAttribute('data-theme') === 'dark';
+        html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+        const btn = document.getElementById('theme-toggle');
+        btn.textContent = isDark ? '🌙' : '☀️';
+        localStorage.setItem('theme', isDark ? 'light' : 'dark');
+      }
+
+      function loadSavedTheme() {
+        const saved = localStorage.getItem('theme');
+        if (saved) {
+          document.documentElement.setAttribute('data-theme', saved);
+          document.getElementById('theme-toggle').textContent = saved === 'dark' ? '☀️' : '🌙';
+        }
+      }
+
+      // =============================================
+      // LOADING SCREEN
+      // =============================================
+      function hideLoadingScreen() {
+        const loader = document.getElementById('loading-screen');
+        setTimeout(() => {
+          loader.classList.add('hidden');
+          animateHeroElements();
+        }, 2800);
+      }
+
+      // =============================================
+      // THREE.JS 3D HERO SCENE
+      // =============================================
+      let threeScene, threeCamera, threeRenderer;
+      let foodObjects = [];
+      let particles;
+      let isThreeEnabled = true;
+
+      function initThreeScene() {
+        // Disable on low-end mobile
+        if (window.innerWidth < 768 || !window.WebGLRenderingContext) {
+          isThreeEnabled = false;
+          const canvas = document.getElementById('hero-canvas');
+          canvas.style.background = 'linear-gradient(135deg, rgba(255,107,53,0.05), rgba(247,147,30,0.05), rgba(46,139,87,0.03))';
+          return;
+        }
+
+        const canvas = document.getElementById('hero-canvas');
+        threeScene = new THREE.Scene();
+        threeCamera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+        threeCamera.position.z = 30;
+
+        threeRenderer = new THREE.WebGLRenderer({
+          canvas,
+          alpha: true,
+          antialias: true,
+        });
+        threeRenderer.setSize(window.innerWidth, window.innerHeight);
+        threeRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+        // Warm ambient lighting
+        const ambientLight = new THREE.AmbientLight(0xFFE4C4, 0.6);
+        threeScene.add(ambientLight);
+
+        const pointLight1 = new THREE.PointLight(0xFF6B35, 1.2, 60);
+        pointLight1.position.set(10, 10, 15);
+        threeScene.add(pointLight1);
+
+        const pointLight2 = new THREE.PointLight(0xF7931E, 0.8, 50);
+        pointLight2.position.set(-10, -5, 10);
+        threeScene.add(pointLight2);
+
+        // Create food-like objects (stylized geometric shapes)
+        createFoodObjects();
+        createParticles();
+
+        // Camera zoom-in animation
+        gsap.from(threeCamera.position, {
+          z: 50,
+          duration: 3,
+          ease: 'power2.out',
+          delay: 2.5,
+        });
+
+        animateThreeScene();
+      }
+
+      function createFoodObjects() {
+        const foodShapes = [
+          // Roti (flat disc/torus)
+          { geo: new THREE.TorusGeometry(2, 0.5, 12, 32), color: 0xD4A06A, pos: [-8, 4, -5] },
+          { geo: new THREE.TorusGeometry(1.5, 0.4, 12, 32), color: 0xC4904A, pos: [10, -3, -8] },
+          // Sabzi bowls (hemisphere/sphere)
+          { geo: new THREE.SphereGeometry(1.8, 24, 16, 0, Math.PI * 2, 0, Math.PI / 2), color: 0x2E8B57, pos: [6, 5, -6] },
+          { geo: new THREE.SphereGeometry(1.4, 24, 16, 0, Math.PI * 2, 0, Math.PI / 2), color: 0xFF6B35, pos: [-5, -5, -10] },
+          // Rice mound (cone)
+          { geo: new THREE.ConeGeometry(1.5, 2, 16), color: 0xFFF8DC, pos: [0, 6, -12] },
+          // Plate (cylinder)
+          { geo: new THREE.CylinderGeometry(2.5, 2.5, 0.2, 32), color: 0xF5F5DC, pos: [-10, -1, -7] },
+          { geo: new THREE.CylinderGeometry(2, 2, 0.15, 32), color: 0xEEE8D5, pos: [12, 2, -10] },
+          // Diya (small cone + light)
+          { geo: new THREE.ConeGeometry(0.6, 0.8, 8), color: 0xF7931E, pos: [4, -6, -4] },
+          { geo: new THREE.ConeGeometry(0.5, 0.6, 8), color: 0xFFAD4D, pos: [-7, 7, -6] },
+          // Extra bowls
+          { geo: new THREE.SphereGeometry(1.2, 20, 12, 0, Math.PI * 2, 0, Math.PI * 0.6), color: 0xCD853F, pos: [8, -7, -9] },
+        ];
+
+        foodShapes.forEach((food, i) => {
+          const material = new THREE.MeshPhongMaterial({
+            color: food.color,
+            shininess: 40,
+            transparent: true,
+            opacity: 0.85,
+          });
+          const mesh = new THREE.Mesh(food.geo, material);
+          mesh.position.set(...food.pos);
+          mesh.rotation.set(
+            Math.random() * Math.PI,
+            Math.random() * Math.PI,
+            Math.random() * Math.PI
+          );
+          mesh.userData = {
+            rotSpeed: {
+              x: (Math.random() - 0.5) * 0.008,
+              y: (Math.random() - 0.5) * 0.008,
+              z: (Math.random() - 0.5) * 0.005,
+            },
+            floatSpeed: 0.3 + Math.random() * 0.5,
+            floatOffset: Math.random() * Math.PI * 2,
+            baseY: food.pos[1],
+          };
+          threeScene.add(mesh);
+          foodObjects.push(mesh);
+        });
+      }
+
+      function createParticles() {
+        const particleCount = 200;
+        const geometry = new THREE.BufferGeometry();
+        const positions = new Float32Array(particleCount * 3);
+        const colors = new Float32Array(particleCount * 3);
+
+        const warmColors = [
+          new THREE.Color(0xFF6B35),
+          new THREE.Color(0xF7931E),
+          new THREE.Color(0xFFAD4D),
+          new THREE.Color(0xFFD700),
+          new THREE.Color(0xFF8C42),
+        ];
+
+        for (let i = 0; i < particleCount; i++) {
+          positions[i * 3] = (Math.random() - 0.5) * 50;
+          positions[i * 3 + 1] = (Math.random() - 0.5) * 40;
+          positions[i * 3 + 2] = (Math.random() - 0.5) * 30 - 10;
+
+          const color = warmColors[Math.floor(Math.random() * warmColors.length)];
+          colors[i * 3] = color.r;
+          colors[i * 3 + 1] = color.g;
+          colors[i * 3 + 2] = color.b;
+        }
+
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+        const material = new THREE.PointsMaterial({
+          size: 0.15,
+          vertexColors: true,
+          transparent: true,
+          opacity: 0.7,
+          blending: THREE.AdditiveBlending,
+        });
+
+        particles = new THREE.Points(geometry, material);
+        threeScene.add(particles);
+      }
+
+      function animateThreeScene() {
+        if (!isThreeEnabled) return;
+
+        const time = performance.now() * 0.001;
+
+        // Rotate and float food objects
+        foodObjects.forEach(obj => {
+          obj.rotation.x += obj.userData.rotSpeed.x;
+          obj.rotation.y += obj.userData.rotSpeed.y;
+          obj.rotation.z += obj.userData.rotSpeed.z;
+          obj.position.y = obj.userData.baseY + Math.sin(time * obj.userData.floatSpeed + obj.userData.floatOffset) * 1.2;
+        });
+
+        // Slowly rotate particles
+        if (particles) {
+          particles.rotation.y += 0.0003;
+          particles.rotation.x += 0.0001;
+        }
+
+        threeRenderer.render(threeScene, threeCamera);
+        requestAnimationFrame(animateThreeScene);
+      }
+
+      // =============================================
+      // HERO ANIMATIONS (GSAP)
+      // =============================================
+      function animateHeroElements() {
+        const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+        tl.to('#hero-badge', { opacity: 1, y: 0, duration: 0.8 })
+          .to('#hero-title', { opacity: 1, y: 0, duration: 1 }, '-=0.4')
+          .to('#hero-subtitle', { opacity: 1, y: 0, duration: 0.8 }, '-=0.5')
+          .to('#hero-desc', { opacity: 1, y: 0, duration: 0.8 }, '-=0.4')
+          .to('#hero-ctas', { opacity: 1, y: 0, duration: 0.8 }, '-=0.4');
+      }
+
+      // =============================================
+      // SCROLL-TRIGGERED REVEALS
+      // =============================================
+      function initScrollReveal() {
+        gsap.registerPlugin(ScrollTrigger);
+
+        document.querySelectorAll('.reveal').forEach(el => {
+          const delay = parseInt(el.dataset.delay || 0);
+          gsap.fromTo(el,
+            { opacity: 0, y: 50 },
+            {
+              opacity: 1,
+              y: 0,
+              duration: 0.9,
+              delay: delay / 1000,
+              ease: 'power3.out',
+              scrollTrigger: {
+                trigger: el,
+                start: 'top 85%',
+                toggleActions: 'play none none none',
+              },
+            }
+          );
+        });
+      }
+
+      // =============================================
+      // ANIMATED COUNTER
+      // =============================================
+      function initAnimatedCounters() {
+        const counters = document.querySelectorAll('.impact-number');
+
+        counters.forEach(counter => {
+          const target = parseInt(counter.dataset.target);
+          const suffix = counter.dataset.suffix || '';
+
+          ScrollTrigger.create({
+            trigger: counter,
+            start: 'top 85%',
+            once: true,
+            onEnter: () => {
+              gsap.to({ val: 0 }, {
+                val: target,
+                duration: 2.5,
+                ease: 'power2.out',
+                onUpdate: function () {
+                  const current = Math.floor(this.targets()[0].val);
+                  counter.textContent = current.toLocaleString('en-IN') + suffix;
+                },
+              });
+            },
+          });
+        });
+      }
+
+      // =============================================
+      // 3D CARD HOVER EFFECT
+      // =============================================
+      function init3DCardEffects() {
+        document.querySelectorAll('.card-3d').forEach(card => {
+          const inner = card.querySelector('.card-3d-inner');
+          if (!inner) return;
+
+          card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            const rotateX = (y - centerY) / centerY * -8;
+            const rotateY = (x - centerX) / centerX * 8;
+
+            inner.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(10px)`;
+          });
+
+          card.addEventListener('mouseleave', () => {
+            inner.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateZ(0px)';
+          });
+        });
+      }
+
+      // =============================================
+      // TESTIMONIALS CAROUSEL
+      // =============================================
+      let currentSlide = 0;
+      const totalSlides = 3;
+
+      function initCarousel() {
+        const track = document.getElementById('testimonials-track');
+        const dots = document.querySelectorAll('.carousel-dot');
+        const prevBtn = document.getElementById('carousel-prev');
+        const nextBtn = document.getElementById('carousel-next');
+
+        function goToSlide(index) {
+          currentSlide = index;
+          track.style.transform = `translateX(-${index * 100}%)`;
+          dots.forEach((dot, i) => {
+            dot.classList.toggle('active', i === index);
+          });
+        }
+
+        prevBtn.addEventListener('click', () => {
+          goToSlide(currentSlide === 0 ? totalSlides - 1 : currentSlide - 1);
+        });
+
+        nextBtn.addEventListener('click', () => {
+          goToSlide(currentSlide === totalSlides - 1 ? 0 : currentSlide + 1);
+        });
+
+        dots.forEach(dot => {
+          dot.addEventListener('click', () => {
+            goToSlide(parseInt(dot.dataset.index));
+          });
+        });
+
+        // Auto-rotate every 6s
+        setInterval(() => {
+          goToSlide(currentSlide === totalSlides - 1 ? 0 : currentSlide + 1);
+        }, 6000);
+      }
+
+      // =============================================
+      // LEAFLET MAP
+      // =============================================
+      function initMap() {
+        const map = L.map('donation-map', {
+          scrollWheelZoom: false,
+        }).setView([22.5, 79], 5);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '© OpenStreetMap contributors',
+          maxZoom: 18,
+        }).addTo(map);
+
+        // Custom icon
+        const donationIcon = L.divIcon({
+          className: 'custom-map-pin',
+          html: `<div style="
+            width: 32px; height: 32px;
+            background: linear-gradient(135deg, #FF6B35, #F7931E);
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(-45deg);
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 3px 10px rgba(255,107,53,0.4);
+            border: 2px solid white;
+          "><span style="transform: rotate(45deg); font-size: 14px;">🍛</span></div>`,
+          iconSize: [32, 32],
+          iconAnchor: [16, 32],
+          popupAnchor: [0, -32],
+        });
+
+        // Sample donation locations across India
+        const donations = [
+          { lat: 28.6139, lng: 77.2090, title: 'Wedding Reception', qty: '300 servings', city: 'New Delhi', time: '2 hrs ago' },
+          { lat: 19.0760, lng: 72.8777, title: 'Corporate Event', qty: '150 servings', city: 'Mumbai', time: '45 min ago' },
+          { lat: 12.9716, lng: 77.5946, title: 'Engagement Party', qty: '200 servings', city: 'Bangalore', time: '1 hr ago' },
+          { lat: 22.5726, lng: 88.3639, title: 'Birthday Celebration', qty: '100 servings', city: 'Kolkata', time: '3 hrs ago' },
+          { lat: 13.0827, lng: 80.2707, title: 'Temple Festival', qty: '500 servings', city: 'Chennai', time: '30 min ago' },
+          { lat: 23.0225, lng: 72.5714, title: 'Wedding Lunch', qty: '400 servings', city: 'Ahmedabad', time: '1.5 hrs ago' },
+          { lat: 26.9124, lng: 75.7873, title: 'Mehndi Ceremony', qty: '250 servings', city: 'Jaipur', time: '2.5 hrs ago' },
+          { lat: 21.1702, lng: 72.8311, title: 'Anniversary Party', qty: '180 servings', city: 'Surat', time: '50 min ago' },
+          { lat: 17.3850, lng: 78.4867, title: 'Housewarming', qty: '120 servings', city: 'Hyderabad', time: '1 hr ago' },
+          { lat: 26.8467, lng: 80.9462, title: 'Wedding Dinner', qty: '600 servings', city: 'Lucknow', time: '20 min ago' },
+          { lat: 18.5204, lng: 73.8567, title: 'Sangeet Night', qty: '350 servings', city: 'Pune', time: '1.5 hrs ago' },
+          { lat: 30.7333, lng: 76.7794, title: 'Langar Donation', qty: '800 servings', city: 'Chandigarh', time: '40 min ago' },
+        ];
+
+        donations.forEach(d => {
+          const marker = L.marker([d.lat, d.lng], { icon: donationIcon }).addTo(map);
+          marker.bindPopup(`
+            <div style="font-family: Inter, sans-serif; padding: 4px;">
+              <strong style="color: #FF6B35; font-size: 14px;">${d.title}</strong><br>
+              <span style="font-size: 12px; color: #5C3317;">📍 ${d.city}</span><br>
+              <span style="font-size: 12px; color: #2E8B57;">🍛 ${d.qty}</span><br>
+              <span style="font-size: 11px; color: #888;">⏰ ${d.time}</span>
+            </div>
+          `);
+        });
+      }
+
+      // =============================================
+      // NAVBAR
+      // =============================================
+      function initNavbar() {
+        const navbar = document.getElementById('navbar');
+        const mobileBtn = document.getElementById('mobile-menu-btn');
+        const navLinks = document.getElementById('nav-links');
+
+        window.addEventListener('scroll', () => {
+          navbar.classList.toggle('scrolled', window.scrollY > 50);
+        });
+
+        mobileBtn.addEventListener('click', () => {
+          const isOpen = navLinks.classList.toggle('open');
+          mobileBtn.classList.toggle('active');
+          mobileBtn.setAttribute('aria-expanded', isOpen);
+        });
+
+        // Close mobile menu on link click
+        navLinks.querySelectorAll('a').forEach(link => {
+          link.addEventListener('click', () => {
+            navLinks.classList.remove('open');
+            mobileBtn.classList.remove('active');
+            mobileBtn.setAttribute('aria-expanded', 'false');
+          });
+        });
+      }
+
+      // =============================================
+      // AI CHATBOT (Anthropic API)
+      // =============================================
+      let chatHistory = [];
+
+      function initChatbot() {
+        const bubble = document.getElementById('chatbot-bubble');
+        const window_ = document.getElementById('chatbot-window');
+        const input = document.getElementById('chatbot-input');
+        const sendBtn = document.getElementById('chatbot-send');
+        const messages = document.getElementById('chatbot-messages');
+
+        bubble.addEventListener('click', () => {
+          const isOpen = window_.classList.toggle('open');
+          bubble.classList.toggle('active');
+          window_.setAttribute('aria-hidden', !isOpen);
+          bubble.textContent = isOpen ? '✕' : '💬';
+          if (isOpen) input.focus();
+        });
+
+        async function sendMessage() {
+          const text = input.value.trim();
+          if (!text) return;
+
+          // Add user message
+          appendMessage(text, 'user');
+          input.value = '';
+          sendBtn.disabled = true;
+
+          chatHistory.push({ role: 'user', content: text });
+
+          // Show typing
+          const typingEl = showTypingIndicator();
+
+          try {
+            const response = await callClaude(chatHistory);
+            removeTypingIndicator(typingEl);
+            appendMessage(response, 'assistant');
+            chatHistory.push({ role: 'assistant', content: response });
+          } catch (err) {
+            removeTypingIndicator(typingEl);
+            const errorMsg = CONFIG.ANTHROPIC_API_KEY
+              ? 'Oops, something went wrong. Please try again! 🙏'
+              : 'API key not configured. Please add your Anthropic API key to use the chatbot. 🔑';
+            appendMessage(errorMsg, 'assistant');
+          }
+
+          sendBtn.disabled = false;
+        }
+
+        sendBtn.addEventListener('click', sendMessage);
+        input.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') sendMessage();
+        });
+      }
+
+      function appendMessage(text, role) {
+        const messages = document.getElementById('chatbot-messages');
+        const div = document.createElement('div');
+        div.className = `chat-message ${role}`;
+        div.innerHTML = `
+          <div class="chat-msg-avatar">${role === 'user' ? '👤' : '🙏'}</div>
+          <div class="chat-msg-bubble">${escapeHtml(text)}</div>
+        `;
+        messages.appendChild(div);
+        messages.scrollTop = messages.scrollHeight;
+      }
+
+      function showTypingIndicator() {
+        const messages = document.getElementById('chatbot-messages');
+        const div = document.createElement('div');
+        div.className = 'chat-message typing';
+        div.innerHTML = `
+          <div class="chat-msg-avatar">🙏</div>
+          <div class="chat-msg-bubble">
+            <div class="typing-indicator">
+              <span class="typing-dot"></span>
+              <span class="typing-dot"></span>
+              <span class="typing-dot"></span>
+            </div>
+          </div>
+        `;
+        messages.appendChild(div);
+        messages.scrollTop = messages.scrollHeight;
+        return div;
+      }
+
+      function removeTypingIndicator(el) {
+        if (el && el.parentNode) el.parentNode.removeChild(el);
+      }
+
+      function escapeHtml(str) {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+      }
+
+      async function callClaude(history) {
+        if (!CONFIG.ANTHROPIC_API_KEY) {
+          // Fallback: provide helpful responses without API
+          return getFallbackResponse(history[history.length - 1].content);
+        }
+
+        const res = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': CONFIG.ANTHROPIC_API_KEY,
+            'anthropic-version': '2023-06-01',
+            'anthropic-dangerous-direct-browser-access': 'true',
+          },
+          body: JSON.stringify({
+            model: CONFIG.CHATBOT_MODEL,
+            max_tokens: 1024,
+            system: CONFIG.CHATBOT_SYSTEM_PROMPT,
+            messages: history,
+          }),
+        });
+
+        if (!res.ok) throw new Error(`API error: ${res.status}`);
+        const data = await res.json();
+        return data.content[0].text;
+      }
+
+      function getFallbackResponse(userMsg) {
+        const msg = userMsg.toLowerCase();
+        if (msg.includes('donate') || msg.includes('food') || msg.includes('surplus') || msg.includes('daana') || msg.includes('खाना')) {
+          return 'To donate surplus food, simply click "I Have Food to Donate" on our homepage. You\'ll fill in details like the event name, food type, quantity (number of servings), your address, and the pickup time window. Once submitted, nearby NGOs get instant notifications and can claim your donation! 🍛🙏';
+        }
+        if (msg.includes('ngo') || msg.includes('register') || msg.includes('एनजीओ')) {
+          return 'NGOs can register by clicking "I\'m an NGO" and providing their NGO registration number, organization details, and service area. Once verified (usually within 24 hours), you\'ll start receiving real-time notifications whenever food is available near you. It\'s completely free! 🤝';
+        }
+        if (msg.includes('safe') || msg.includes('safety') || msg.includes('hygiene') || msg.includes('सुरक्षा')) {
+          return 'Food safety is our top priority! We recommend: \n• Food should be consumed within 4-6 hours of preparation\n• Hot foods should be kept above 60°C, cold foods below 4°C\n• Each listing has a countdown timer showing the safe pickup window\n• Our partner NGOs are trained in food handling best practices 🛡️';
+        }
+        if (msg.includes('hello') || msg.includes('hi') || msg.includes('namaste') || msg.includes('नमस्ते')) {
+          return 'Namaste! 🙏 Welcome to Annadata! I\'m Annapurna, here to help you with anything — whether you want to donate food, register as an NGO, or just learn more about our mission to end food waste. Kya help chahiye aapko?';
+        }
+        if (msg.includes('how') || msg.includes('work') || msg.includes('kaise') || msg.includes('कैसे')) {
+          return 'Annadata works in 3 simple steps:\n1️⃣ Organizers list surplus food with details\n2️⃣ Nearby NGOs get instant notifications\n3️⃣ NGOs claim & distribute to those in need\n\nThe whole process takes under 60 minutes from listing to delivery! Bahut simple hai 😊';
+        }
+        return 'Thank you for your message! 🙏 I can help you with:\n\n• 🍛 How to donate surplus food\n• 🤝 NGO registration process\n• 🛡️ Food safety guidelines\n• 📊 Our impact & statistics\n• ❓ Any other questions\n\nKya jaanna chahte hain aap? (What would you like to know?)';
+      }
+
+      // =============================================
+      // WINDOW RESIZE HANDLER
+      // =============================================
+      function handleResize() {
+        if (isThreeEnabled && threeRenderer && threeCamera) {
+          threeCamera.aspect = window.innerWidth / window.innerHeight;
+          threeCamera.updateProjectionMatrix();
+          threeRenderer.setSize(window.innerWidth, window.innerHeight);
+        }
+      }
+
+      // =============================================
+      // MICRO-INTERACTIONS
+      // =============================================
+      function initMicroInteractions() {
+        // Button ripple effect
+        document.querySelectorAll('.btn, .btn-white, .btn-outline-white, .carousel-btn').forEach(btn => {
+          btn.addEventListener('click', function (e) {
+            const ripple = document.createElement('span');
+            const rect = this.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            ripple.style.cssText = `
+              position: absolute;
+              width: ${size}px;
+              height: ${size}px;
+              left: ${e.clientX - rect.left - size / 2}px;
+              top: ${e.clientY - rect.top - size / 2}px;
+              background: rgba(255,255,255,0.3);
+              border-radius: 50%;
+              transform: scale(0);
+              pointer-events: none;
+              animation: rippleEffect 0.6s ease forwards;
+            `;
+            this.style.position = 'relative';
+            this.style.overflow = 'hidden';
+            this.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 600);
+          });
+        });
+
+        // Add ripple keyframes
+        const style = document.createElement('style');
+        style.textContent = `
+          @keyframes rippleEffect {
+            to { transform: scale(2.5); opacity: 0; }
+          }
+        `;
+        document.head.appendChild(style);
+      }
+
+      // =============================================
+      // SMOOTH SCROLL FOR ANCHOR LINKS
+      // =============================================
+      function initSmoothScroll() {
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+          anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+              const offset = 80;
+              const top = target.getBoundingClientRect().top + window.pageYOffset - offset;
+              window.scrollTo({ top, behavior: 'smooth' });
+            }
+          });
+        });
+      }
+
+      // =============================================
+      // INIT EVERYTHING
+      // =============================================
+      function init() {
+        loadSavedTheme();
+        hideLoadingScreen();
+        initThreeScene();
+        initNavbar();
+        initScrollReveal();
+        initAnimatedCounters();
+        init3DCardEffects();
+        initCarousel();
+        initMap();
+        initChatbot();
+        initMicroInteractions();
+        initSmoothScroll();
+
+        // Event listeners
+        document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+        document.getElementById('lang-toggle').addEventListener('click', toggleLanguage);
+        window.addEventListener('resize', handleResize);
+      }
+
+      // Start when DOM is ready
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+      } else {
+        init();
+      }
+    })();
+  </script>
+</body>
+</html>

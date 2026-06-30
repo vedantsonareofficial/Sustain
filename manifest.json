@@ -1,0 +1,24 @@
+{
+  "name": "Annadata — End Food Waste",
+  "short_name": "Annadata",
+  "description": "Connect surplus wedding & event food with NGOs who deliver it to those in need.",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#FFF8F0",
+  "theme_color": "#FF6B35",
+  "orientation": "portrait-primary",
+  "lang": "en",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "categories": ["food", "social", "nonprofit"]
+}

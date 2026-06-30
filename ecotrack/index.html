@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="EcoTrack - Track your personal carbon footprint with actionable insights. Calculate daily CO2 emissions from transport, energy, food, and shopping habits." />
+  <meta name="theme-color" content="#2d6a4f" />
+  <meta name="keywords" content="carbon footprint, CO2 tracker, sustainability, eco-friendly, climate change" />
+  <meta name="author" content="EcoTrack" />
+  <title>EcoTrack - Personal Carbon Footprint Tracker</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    // =========================================================================
+    // EcoTrack — Personal Carbon Footprint Tracker
+    // A fully client-side React 18 application. No API calls, all calculations
+    // run locally. History is persisted in localStorage.
+    // =========================================================================
+
+    const { useState, useEffect, useCallback, useMemo, useRef } = React;
+
+    // ── Constants ────────────────────────────────────────────────────────────
+
+    const STORAGE_KEY = 'ecotrack_history';
+    const MAX_HISTORY = 7;
+    const GAUGE_MAX_KG = 30;
+
+    /** Emission factors — kg CO₂ */
+    const TRANSPORT_FACTORS = {
+      'Car-Petrol':       0.21,
+      'Car-Diesel':       0.17,
+      'Car-Electric':     0.05,
+      'Bus':              0.089,
+      'Train':            0.041,
+      'Flight':           0.255,
+      'Walking/Cycling':  0,
+    };
+
+    const FOOD_FACTORS = {
+      'Meat-heavy':  7.19,
+      'Mixed':       5.63,
+      'Vegetarian':  3.81,
+      'Vegan':       2.89,
+    };
+
+    const SHOPPING_FACTORS = {
+      'New Electronics': 3.5,
+      'New Clothes':     1.5,
+      'No Shopping':     0,
+    };
+
+    const TIPS_DATA = {
+      transport: [
+        { emoji: '🚌', title: 'Go public',   text: 'Switch to public transport' },
+        { emoji: '🚲', title: 'Short trips',  text: 'Try carpooling or bike for short trips' },
+        { emoji: '🔋', title: 'Go electric',  text: 'Consider an EV for your next car' },
+      ],
+      energy: [
+        { emoji: '💡', title: 'LED lighting',    text: 'Switch to LED bulbs and energy-efficient appliances' },
+        { emoji: '☀️', title: 'Solar power',     text: 'Install solar panels to cut emissions by 30%+' },
+        { emoji: '🌡️', title: 'Smart heating',   text: 'Use a smart thermostat to optimize heating' },
+      ],
+      food: [
+        { emoji: '🥗', title: 'Meatless Monday', text: 'Try Meatless Mondays to start' },
+        { emoji: '🌽', title: 'Local produce',   text: 'Choose local and seasonal produce' },
+        { emoji: '📝', title: 'Plan meals',       text: 'Reduce food waste by planning meals' },
+      ],
+      shopping: [
+        { emoji: '🔧', title: 'Repair first',     text: 'Extend device life - repair before replacing' },
+        { emoji: '♻️', title: 'Buy refurbished',  text: 'Buy second-hand or refurbished electronics' },
+        { emoji: '👕', title: 'Sustainable fashion', text: 'Choose sustainable fashion brands' },
+      ],
+    };
+
+    const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+    // ── Utility helpers ─────────────────────────────────────────────────────
+
+    /** Format number to 2 decimal places */
+    const fmt = (n) => Number(n).toFixed(2);
+
+    /** Get today's date string YYYY-MM-DD */
+    const todayStr = () => {
+      const d = new Date();
+      return d.getFullYear() + '-' +
+        String(d.getMonth() + 1).padStart(2, '0') + '-' +
+        String(d.getDate()).padStart(2, '0');
+    };
+
+    /** Get short day name for a YYYY-MM-DD string */
+    const dayName = (dateStr) => {
+      const d = new Date(dateStr + 'T00:00:00');
+      return DAY_NAMES[d.getDay()];
+    };
+
+    /** Score → color class name */
+    const scoreColor = (score) => {
+      if (score < 5) return 'green';
+      if (score <= 15) return 'yellow';
+      return 'red';
+    };
+
+    // ── Pure calculation function ───────────────────────────────────────────
+
+    function calculateFootprint(formData) {
+      const { transportMode, distance, electricity, gasUsage, solarPanels, diet, shopping } = formData;
+
+      // Transport
+      const transportEmission = (TRANSPORT_FACTORS[transportMode] || 0) * (parseFloat(distance) || 0);
+
+      // Energy
+      let electricityEmission = (parseFloat(electricity) || 0) * 0.82;
+      if (solarPanels) {
+        electricityEmission *= 0.7; // solar reduces by 30%
+      }
+      const gasEmission = gasUsage ? 2.0 : 0;
+      const energyEmission = electricityEmission + gasEmission;
+
+      // Food
+      const foodEmission = FOOD_FACTORS[diet] || 0;
+
+      // Shopping
+      const shoppingEmission = SHOPPING_FACTORS[shopping] || 0;
+
+      // Total
+      const total = transportEmission + energyEmission + foodEmission + shoppingEmission;
+
+      // Breakdown percentages (avoid division by zero)
+      const pct = (part) => total > 0 ? (part / total) * 100 : 0;
+
+      return {
+        total,
+        transport:  transportEmission,
+        energy:     energyEmission,
+        food:       foodEmission,
+        shopping:   shoppingEmission,
+        breakdown: {
+          transport: pct(transportEmission),
+          energy:    pct(energyEmission),
+          food:      pct(foodEmission),
+          shopping:  pct(shoppingEmission),
+        },
+      };
+    }
+
+    // ── Components ──────────────────────────────────────────────────────────
+
+    /** Animated header with leaf icon */
+    function Header() {
+      return (
+        <header className="header">
+          <h1 className="header-title">
+            <span className="leaf-icon">🌿</span> EcoTrack
+          </h1>
+          <p className="header-subtitle">Track your carbon footprint, save the planet</p>
+        </header>
+      );
+    }
+
+    /** Carbon footprint input form */
+    function CarbonForm({ onSubmit }) {
+      const [transportMode, setTransportMode] = useState('Car-Petrol');
+      const [distance, setDistance]           = useState('');
+      const [electricity, setElectricity]     = useState('');
+      const [gasUsage, setGasUsage]           = useState(false);
+      const [solarPanels, setSolarPanels]     = useState(false);
+      const [diet, setDiet]                   = useState('Mixed');
+      const [shopping, setShopping]           = useState('No Shopping');
+      const [errors, setErrors]               = useState({});
+
+      const validate = useCallback(() => {
+        const errs = {};
+        if (transportMode !== 'Walking/Cycling' && (!distance || parseFloat(distance) < 0)) {
+          errs.distance = 'Please enter a valid distance (0 or more).';
+        }
+        if (!electricity && electricity !== '0') {
+          errs.electricity = 'Please enter your electricity usage.';
+        } else if (parseFloat(electricity) < 0) {
+          errs.electricity = 'Electricity cannot be negative.';
+        }
+        return errs;
+      }, [transportMode, distance, electricity]);
+
+      const handleSubmit = useCallback((e) => {
+        e.preventDefault();
+        const errs = validate();
+        setErrors(errs);
+        if (Object.keys(errs).length > 0) return;
+
+        onSubmit({
+          transportMode,
+          distance: parseFloat(distance) || 0,
+          electricity: parseFloat(electricity) || 0,
+          gasUsage,
+          solarPanels,
+          diet,
+          shopping,
+        });
+      }, [validate, onSubmit, transportMode, distance, electricity, gasUsage, solarPanels, diet, shopping]);
+
+      return (
+        <form className="input-card" onSubmit={handleSubmit} noValidate>
+          {/* ── Transport ──────────────────────────────────── */}
+          <div className="category-section">
+            <div className="category-header">
+              <span className="category-icon">🚗</span>
+              <span className="category-title">Transport</span>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label" htmlFor="transport-mode">Mode of transport</label>
+              <select
+                id="transport-mode"
+                className="form-select"
+                value={transportMode}
+                onChange={(e) => setTransportMode(e.target.value)}
+              >
+                {Object.keys(TRANSPORT_FACTORS).map((mode) => (
+                  <option key={mode} value={mode}>{mode}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label" htmlFor="distance">Distance travelled (km)</label>
+              <input
+                id="distance"
+                className="form-input"
+                type="number"
+                min="0"
+                step="any"
+                placeholder="e.g. 25"
+                value={distance}
+                onChange={(e) => setDistance(e.target.value)}
+              />
+              {errors.distance && <span className="form-error">{errors.distance}</span>}
+            </div>
+          </div>
+
+          {/* ── Home Energy ─────────────────────────────────── */}
+          <div className="category-section">
+            <div className="category-header">
+              <span className="category-icon">⚡</span>
+              <span className="category-title">Home Energy</span>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label" htmlFor="electricity">Electricity used (kWh)</label>
+              <input
+                id="electricity"
+                className="form-input"
+                type="number"
+                min="0"
+                step="any"
+                placeholder="e.g. 8"
+                value={electricity}
+                onChange={(e) => setElectricity(e.target.value)}
+              />
+              {errors.electricity && <span className="form-error">{errors.electricity}</span>}
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Gas usage</label>
+              <div className="toggle-group">
+                <span>No</span>
+                <label className="toggle-switch">
+                  <input
+                    type="checkbox"
+                    checked={gasUsage}
+                    onChange={(e) => setGasUsage(e.target.checked)}
+                  />
+                  <span className="toggle-slider"></span>
+                </label>
+                <span>Yes</span>
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Solar panels</label>
+              <div className="toggle-group">
+                <span>No</span>
+                <label className="toggle-switch">
+                  <input
+                    type="checkbox"
+                    checked={solarPanels}
+                    onChange={(e) => setSolarPanels(e.target.checked)}
+                  />
+                  <span className="toggle-slider"></span>
+                </label>
+                <span>Yes</span>
+              </div>
+            </div>
+          </div>
+
+          {/* ── Food ────────────────────────────────────────── */}
+          <div className="category-section">
+            <div className="category-header">
+              <span className="category-icon">🍔</span>
+              <span className="category-title">Food</span>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label" htmlFor="diet">Diet type</label>
+              <select
+                id="diet"
+                className="form-select"
+                value={diet}
+                onChange={(e) => setDiet(e.target.value)}
+              >
+                {Object.keys(FOOD_FACTORS).map((d) => (
+                  <option key={d} value={d}>{d}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* ── Shopping ────────────────────────────────────── */}
+          <div className="category-section">
+            <div className="category-header">
+              <span className="category-icon">🛍️</span>
+              <span className="category-title">Shopping</span>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label" htmlFor="shopping">Recent purchases</label>
+              <select
+                id="shopping"
+                className="form-select"
+                value={shopping}
+                onChange={(e) => setShopping(e.target.value)}
+              >
+                {Object.keys(SHOPPING_FACTORS).map((s) => (
+                  <option key={s} value={s}>{s}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <button type="submit" className="submit-btn">
+            Calculate My Footprint 🌍
+          </button>
+        </form>
+      );
+    }
+
+    /** Semicircular gauge + verdict + comparison + breakdown */
+    function ResultsDisplay({ results }) {
+      const resultsRef = useRef(null);
+      const [animate, setAnimate] = useState(false);
+
+      // Smooth-scroll into view + trigger animation on mount
+      useEffect(() => {
+        if (resultsRef.current) {
+          resultsRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        // Small delay so CSS transitions kick in after the element is in the DOM
+        const timer = setTimeout(() => setAnimate(true), 60);
+        return () => clearTimeout(timer);
+      }, []);
+
+      const { total, transport, energy, food, shopping, breakdown } = results;
+
+      // ── Gauge angle (0–180°) ───────────────────────────
+      const clampedTotal = Math.min(total, GAUGE_MAX_KG);
+      const needleAngle  = (clampedTotal / GAUGE_MAX_KG) * 180;
+
+      // ── Verdict ────────────────────────────────────────
+      let verdictEmoji, verdictText;
+      if (total < 5) {
+        verdictEmoji = '🌱';
+        verdictText  = 'Eco Hero! Outstanding!';
+      } else if (total <= 15) {
+        verdictEmoji = '🌍';
+        verdictText  = 'Average Impact. Room to improve!';
+      } else {
+        verdictEmoji = '🔥';
+        verdictText  = "High Impact! Let's reduce this!";
+      }
+
+      // ── Comparison ─────────────────────────────────────
+      const yearlyKg     = total * 365;
+      const indianAvgKg  = 1900;
+      const worldAvgKg   = 4700;
+      const maxBarKg     = Math.max(yearlyKg, worldAvgKg) * 1.1; // a little headroom
+      const pctOfWorld   = ((yearlyKg / worldAvgKg) * 100).toFixed(0);
+
+      const comparisons = [
+        { label: 'You (projected)',  value: yearlyKg,    color: scoreColor(total) },
+        { label: 'India Average',    value: indianAvgKg,  color: 'yellow' },
+        { label: 'World Average',    value: worldAvgKg,   color: 'red' },
+      ];
+
+      // ── Category breakdown cards ──────────────────────
+      const categories = [
+        { icon: '🚗', title: 'Transport', kg: transport, pct: breakdown.transport },
+        { icon: '⚡', title: 'Energy',    kg: energy,    pct: breakdown.energy },
+        { icon: '🍔', title: 'Food',      kg: food,      pct: breakdown.food },
+        { icon: '🛍️', title: 'Shopping',  kg: shopping,  pct: breakdown.shopping },
+      ];
+
+      return (
+        <section className="results-section" ref={resultsRef}>
+          {/* ── Gauge ────────────────────── */}
+          <div className="gauge-container">
+            <div className="gauge">
+              <div className="gauge-zones">
+                <div className="gauge-zone gauge-zone-green"></div>
+                <div className="gauge-zone gauge-zone-yellow"></div>
+                <div className="gauge-zone gauge-zone-red"></div>
+              </div>
+              <div
+                className="gauge-fill"
+                style={{ transform: `rotate(${animate ? needleAngle : 0}deg)` }}
+              ></div>
+              <div
+                className="gauge-needle"
+                style={{ transform: `rotate(${animate ? needleAngle : 0}deg)` }}
+              ></div>
+              <div className="gauge-center">
+                <span className={`gauge-value text-${scoreColor(total)}`}>{fmt(total)}</span>
+                <span className="gauge-label">kg CO₂/day</span>
+              </div>
+            </div>
+          </div>
+
+          {/* ── Verdict ──────────────────── */}
+          <div className="verdict">
+            <span className="verdict-emoji">{verdictEmoji}</span>
+            <span className="verdict-text">{verdictText}</span>
+          </div>
+
+          {/* ── Comparison ───────────────── */}
+          <div className="comparison-section">
+            <h3>Yearly Projection Comparison</h3>
+            {comparisons.map((item) => (
+              <div className="comparison-item" key={item.label}>
+                <div className="comparison-label">{item.label}</div>
+                <div className="comparison-bar">
+                  <div
+                    className={`comparison-fill bg-${item.color}`}
+                    style={{ width: animate ? `${(item.value / maxBarKg) * 100}%` : '0%' }}
+                  ></div>
+                </div>
+                <div className="comparison-value">{(item.value / 1000).toFixed(2)} t</div>
+              </div>
+            ))}
+            <p className="comparison-note">
+              Your projected footprint is <strong>{pctOfWorld}%</strong> of the world average.
+            </p>
+          </div>
+
+          {/* ── Breakdown ────────────────── */}
+          <div className="breakdown-grid">
+            {categories.map((cat) => (
+              <div className="breakdown-card" key={cat.title}>
+                <div className="breakdown-title">{cat.icon} {cat.title}</div>
+                <div className="breakdown-value">{fmt(cat.kg)} kg</div>
+                <div className="breakdown-bar">
+                  <div
+                    className="breakdown-fill"
+                    style={{ width: animate ? `${cat.pct}%` : '0%' }}
+                  ></div>
+                </div>
+                <div className="breakdown-pct">{fmt(cat.pct)}%</div>
+              </div>
+            ))}
+          </div>
+        </section>
+      );
+    }
+
+    /** Actionable tips based on the highest-emission category */
+    function TipsSection({ results }) {
+      // Determine the category with the highest emission
+      const categoryMap = {
+        transport: results.transport,
+        energy:    results.energy,
+        food:      results.food,
+        shopping:  results.shopping,
+      };
+
+      const highestCategory = useMemo(() => {
+        return Object.entries(categoryMap).reduce(
+          (max, [key, val]) => (val > max.val ? { key, val } : max),
+          { key: 'transport', val: -1 }
+        ).key;
+      }, [results]);
+
+      const tips = TIPS_DATA[highestCategory];
+
+      return (
+        <section className="tips-section">
+          <h2>💡 Tips to Reduce Your Footprint</h2>
+          <p className="tips-intro">
+            Your biggest source of emissions is <strong>{highestCategory}</strong>. Here's how to cut back:
+          </p>
+          <div className="tips-grid">
+            {tips.map((tip, i) => (
+              <div className="tip-card" key={i}>
+                <span className="tip-icon">{tip.emoji}</span>
+                <div>
+                  <div className="tip-title">{tip.title}</div>
+                  <div className="tip-text">{tip.text}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      );
+    }
+
+    /** Weekly progress bar chart persisted in localStorage */
+    function ProgressTracker({ history, onClearHistory }) {
+      const [animate, setAnimate] = useState(false);
+
+      useEffect(() => {
+        const timer = setTimeout(() => setAnimate(true), 100);
+        return () => clearTimeout(timer);
+      }, [history]);
+
+      const maxScore = useMemo(() => {
+        if (history.length === 0) return 1;
+        return Math.max(...history.map((h) => h.score), 1);
+      }, [history]);
+
+      return (
+        <section className="progress-section">
+          <h2>📊 Your 7-Day Progress</h2>
+
+          {history.length === 0 ? (
+            <p className="chart-empty">Start tracking to see your progress here!</p>
+          ) : (
+            <>
+              <div className="chart-container">
+                {history.map((entry, i) => {
+                  const heightPct = (entry.score / maxScore) * 100;
+                  const color     = scoreColor(entry.score);
+                  return (
+                    <div className="chart-bar-group" key={entry.date}>
+                      <span className="chart-bar-value">{fmt(entry.score)}</span>
+                      <div
+                        className={`chart-bar bg-${color}`}
+                        style={{ height: animate ? `${heightPct}%` : '0%' }}
+                      ></div>
+                      <span className="chart-bar-label">{entry.day}</span>
+                    </div>
+                  );
+                })}
+              </div>
+              <button className="clear-btn" onClick={onClearHistory}>
+                Clear History
+              </button>
+            </>
+          )}
+        </section>
+      );
+    }
+
+    /** Simple footer */
+    function Footer() {
+      return (
+        <footer className="footer">
+          Made with 💚 for the planet | All calculations run locally
+        </footer>
+      );
+    }
+
+    // ── App (root component) ────────────────────────────────────────────────
+
+    function App() {
+      const [results, setResults] = useState(null);
+      const [history, setHistory] = useState([]);
+
+      // Load history from localStorage on mount
+      useEffect(() => {
+        try {
+          const stored = localStorage.getItem(STORAGE_KEY);
+          if (stored) {
+            setHistory(JSON.parse(stored));
+          }
+        } catch {
+          // Silently ignore corrupt data
+        }
+      }, []);
+
+      // Persist history whenever it changes
+      useEffect(() => {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+      }, [history]);
+
+      /** Handle form submission */
+      const handleCalculate = useCallback((formData) => {
+        const res = calculateFootprint(formData);
+        setResults(res);
+
+        // Update history
+        setHistory((prev) => {
+          const today = todayStr();
+          const day   = dayName(today);
+          // Remove existing entry for today (overwrite)
+          const filtered = prev.filter((h) => h.date !== today);
+          const updated  = [...filtered, { date: today, score: res.total, day }];
+          // Keep only last 7 entries
+          return updated.slice(-MAX_HISTORY);
+        });
+      }, []);
+
+      /** Clear all saved history */
+      const handleClearHistory = useCallback(() => {
+        setHistory([]);
+        localStorage.removeItem(STORAGE_KEY);
+      }, []);
+
+      return (
+        <div className="app-container">
+          <Header />
+          <CarbonForm onSubmit={handleCalculate} />
+
+          {results && (
+            <>
+              <ResultsDisplay results={results} />
+              <TipsSection results={results} />
+            </>
+          )}
+
+          <ProgressTracker history={history} onClearHistory={handleClearHistory} />
+          <Footer />
+        </div>
+      );
+    }
+
+    // ── Mount ───────────────────────────────────────────────────────────────
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
