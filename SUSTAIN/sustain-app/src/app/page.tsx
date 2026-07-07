@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import Link from "next/link";
+import { useTheme } from "next-themes";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { ChatWidget } from "@/components/ChatWidget";
@@ -9,7 +10,16 @@ import { GlobeSwitcher } from "@/components/GlobeSwitcher";
 
 export default function LandingPage() {
   const sectionsRef = useRef<HTMLDivElement>(null);
+  const heroRef = useRef<HTMLElement>(null);
+  const globeRef = useRef<HTMLDivElement>(null);
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
 
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Reveal-on-scroll observer
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -35,25 +45,99 @@ export default function LandingPage() {
     };
   }, []);
 
+  // Scroll-linked parallax for the globe
+  const handleScroll = useCallback(() => {
+    if (!globeRef.current || !heroRef.current) return;
+    const heroRect = heroRef.current.getBoundingClientRect();
+    const heroHeight = heroRef.current.offsetHeight;
+    // scrollProgress: 0 at top, 1 when hero is fully scrolled past
+    const scrollProgress = Math.min(Math.max(-heroRect.top / heroHeight, 0), 1);
+    const translateY = scrollProgress * -60; // subtle upward shift
+    const scale = 1 + scrollProgress * 0.08; // slight grow
+    globeRef.current.style.transform = `translateY(${translateY}px) scale(${scale})`;
+  }, []);
+
+  useEffect(() => {
+    let rafId: number;
+    const onScroll = () => {
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(handleScroll);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    handleScroll(); // initial position
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      cancelAnimationFrame(rafId);
+    };
+  }, [handleScroll]);
+
+  const isDark = mounted && resolvedTheme === "dark";
+
   return (
     <div className="flex flex-col min-h-screen relative w-full overflow-x-hidden pb-16" ref={sectionsRef}>
       <Navbar />
 
-      {/* Hero Section */}
-      <header className="relative pt-32 pb-20 overflow-hidden bg-surface/50 backdrop-blur-[2px] w-full min-h-[90vh] md:min-h-screen flex items-center">
-        {/* Background 3D Globe */}
-        <div className="absolute right-[-120px] bottom-[-120px] md:right-[-300px] md:bottom-[-350px] w-[450px] h-[450px] md:w-[950px] md:h-[950px] pointer-events-none -z-10 opacity-75 dark:opacity-85">
+      {/* Hero Section — no overflow-hidden so globe is not clipped */}
+      <header
+        ref={heroRef}
+        className="relative pt-32 pb-20 bg-surface/50 backdrop-blur-[2px] w-full min-h-[90vh] md:min-h-screen flex items-center"
+      >
+        {/* Dark-mode starfield */}
+        {isDark && (
+          <div
+            className="absolute inset-0 pointer-events-none z-0"
+            aria-hidden="true"
+            style={{
+              background: `
+                radial-gradient(1px 1px at 10% 15%, rgba(255,255,255,0.5) 50%, transparent 100%),
+                radial-gradient(1px 1px at 25% 35%, rgba(255,255,255,0.35) 50%, transparent 100%),
+                radial-gradient(1.2px 1.2px at 40% 8%, rgba(255,255,255,0.45) 50%, transparent 100%),
+                radial-gradient(1px 1px at 55% 45%, rgba(255,255,255,0.3) 50%, transparent 100%),
+                radial-gradient(1px 1px at 70% 20%, rgba(255,255,255,0.5) 50%, transparent 100%),
+                radial-gradient(0.8px 0.8px at 85% 55%, rgba(255,255,255,0.25) 50%, transparent 100%),
+                radial-gradient(1.5px 1.5px at 15% 70%, rgba(255,255,255,0.4) 50%, transparent 100%),
+                radial-gradient(1px 1px at 30% 85%, rgba(255,255,255,0.3) 50%, transparent 100%),
+                radial-gradient(1px 1px at 60% 75%, rgba(255,255,255,0.35) 50%, transparent 100%),
+                radial-gradient(0.8px 0.8px at 78% 90%, rgba(255,255,255,0.3) 50%, transparent 100%),
+                radial-gradient(1px 1px at 92% 12%, rgba(255,255,255,0.4) 50%, transparent 100%),
+                radial-gradient(1.2px 1.2px at 5% 50%, rgba(255,255,255,0.35) 50%, transparent 100%),
+                radial-gradient(1px 1px at 48% 28%, rgba(255,255,255,0.3) 50%, transparent 100%),
+                radial-gradient(0.8px 0.8px at 65% 60%, rgba(255,255,255,0.25) 50%, transparent 100%),
+                radial-gradient(1px 1px at 35% 55%, rgba(255,255,255,0.35) 50%, transparent 100%),
+                radial-gradient(1.2px 1.2px at 82% 40%, rgba(255,255,255,0.4) 50%, transparent 100%),
+                radial-gradient(1px 1px at 18% 92%, rgba(255,255,255,0.3) 50%, transparent 100%),
+                radial-gradient(0.8px 0.8px at 50% 5%, rgba(255,255,255,0.45) 50%, transparent 100%),
+                radial-gradient(1px 1px at 72% 68%, rgba(255,255,255,0.3) 50%, transparent 100%),
+                radial-gradient(1.5px 1.5px at 95% 78%, rgba(255,255,255,0.35) 50%, transparent 100%),
+                radial-gradient(1px 1px at 8% 38%, rgba(255,255,255,0.3) 50%, transparent 100%),
+                radial-gradient(0.8px 0.8px at 42% 95%, rgba(255,255,255,0.25) 50%, transparent 100%),
+                radial-gradient(1px 1px at 58% 15%, rgba(255,255,255,0.4) 50%, transparent 100%),
+                radial-gradient(1.2px 1.2px at 88% 25%, rgba(255,255,255,0.35) 50%, transparent 100%)
+              `,
+            }}
+          />
+        )}
+
+        {/* Background 3D Globe — with soft mask fade-out and scroll parallax */}
+        <div
+          ref={globeRef}
+          className="absolute right-[-120px] bottom-[-120px] md:right-[-300px] md:bottom-[-350px] w-[450px] h-[450px] md:w-[950px] md:h-[950px] pointer-events-none z-0 opacity-75 dark:opacity-85 will-change-transform transition-[transform] duration-100 ease-out"
+          style={{
+            maskImage: "radial-gradient(ellipse at center, black 50%, transparent 85%)",
+            WebkitMaskImage: "radial-gradient(ellipse at center, black 50%, transparent 85%)",
+          }}
+        >
           <GlobeSwitcher />
         </div>
 
         {/* Subtle gradient overlay to ensure text readability */}
-        <div className="absolute inset-0 bg-gradient-to-r from-surface via-surface/85 to-surface/30 -z-10 pointer-events-none md:block hidden" />
-        <div className="absolute inset-0 bg-gradient-to-b from-surface via-surface/95 to-surface/40 -z-10 pointer-events-none md:hidden block" />
+        <div className="absolute inset-0 bg-gradient-to-r from-surface via-surface/85 to-surface/30 z-[1] pointer-events-none md:block hidden" />
+        <div className="absolute inset-0 bg-gradient-to-b from-surface via-surface/95 to-surface/40 z-[1] pointer-events-none md:hidden block" />
 
-        <div className="max-w-7xl mx-auto px-6 md:px-32 w-full">
+        <div className="max-w-7xl mx-auto px-6 md:px-32 w-full relative z-[2]">
           <div className="flex flex-col md:flex-row items-center gap-12">
             {/* Left Content */}
-            <div className="flex-1 text-center md:text-left z-10">
+            <div className="flex-1 text-center md:text-left">
               <h1 className="font-headline text-5xl md:text-[56px] text-primary mb-6 leading-[1.1] font-bold">
                 Turn Surplus <br className="hidden md:block" /> Into <span className="text-secondary italic">Support</span> Across India
               </h1>
