@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useTheme } from "next-themes";
 import { Sidebar } from "@/components/Sidebar";
 import { Footer } from "@/components/Footer";
 import { ChatWidget } from "@/components/ChatWidget";
@@ -18,6 +19,98 @@ interface FoodListing {
 
 export default function NgoDashboard() {
   const [searchQuery, setSearchQuery] = useState("");
+  const { resolvedTheme } = useTheme();
+  const mapRef = useRef<any>(null);
+  const [leafletLoaded, setLeafletLoaded] = useState(false);
+
+  useEffect(() => {
+    // Load Leaflet resources dynamically if not already loaded
+    if (!document.getElementById("leaflet-css")) {
+      const link = document.createElement("link");
+      link.id = "leaflet-css";
+      link.rel = "stylesheet";
+      link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
+      document.head.appendChild(link);
+    }
+
+    if (!document.getElementById("leaflet-js")) {
+      const script = document.createElement("script");
+      script.id = "leaflet-js";
+      script.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
+      script.onload = () => setLeafletLoaded(true);
+      document.body.appendChild(script);
+    } else {
+      setLeafletLoaded(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!leafletLoaded) return;
+    const L = (window as any).L;
+    if (!L) return;
+
+    if (mapRef.current) {
+      mapRef.current.remove();
+    }
+
+    const map = L.map("leaflet-map-container", {
+      center: [22.9734, 78.6569], // Central India
+      zoom: 5,
+      zoomControl: false,
+      attributionControl: false
+    });
+    mapRef.current = map;
+
+    // Use CartoDB Voyager (light) or Dark Matter (dark) tiles
+    const isDark = resolvedTheme === "dark";
+    const tileUrl = isDark
+      ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+      : "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png";
+
+    L.tileLayer(tileUrl, {
+      maxZoom: 19,
+    }).addTo(map);
+
+    const hubs = [
+      { name: "Delhi", lat: 28.7041, lng: 77.1025, type: "restaurant" },
+      { name: "Mumbai", lat: 19.0760, lng: 72.8777, type: "restaurant" },
+      { name: "Kolkata", lat: 22.5726, lng: 88.3639, type: "basket" },
+      { name: "Bengaluru", lat: 12.9716, lng: 77.5946, type: "restaurant" },
+      { name: "Chennai", lat: 13.0827, lng: 80.2707, type: "basket" }
+    ];
+
+    hubs.forEach((hub) => {
+      const isRestaurant = hub.type === "restaurant";
+      const iconHtml = `
+        <div class="relative flex flex-col items-center select-none" style="transform: translate(-50%, -50%);">
+          ${isRestaurant ? '<div class="absolute w-8 h-8 bg-emerald-500/30 rounded-full animate-ping"></div>' : ''}
+          <div class="w-8 h-8 rounded-full border-2 border-white flex items-center justify-center text-white shadow-md ${
+            isRestaurant ? 'bg-emerald-600' : 'bg-teal-600'
+          }">
+            <span class="material-symbols-outlined text-[16px]">${isRestaurant ? 'restaurant' : 'shopping_basket'}</span>
+          </div>
+          <span class="mt-1 text-[9px] font-bold text-emerald-800 dark:text-emerald-300 bg-white/90 dark:bg-zinc-800/90 backdrop-blur-sm px-1.5 py-0.5 rounded-full shadow-sm border border-emerald-500/20 whitespace-nowrap">${hub.name}</span>
+        </div>
+      `;
+
+      const customIcon = L.divIcon({
+        html: iconHtml,
+        className: "custom-leaflet-icon",
+        iconSize: [0, 0],
+        iconAnchor: [0, 0]
+      });
+
+      L.marker([hub.lat, hub.lng], { icon: customIcon }).addTo(map);
+    });
+
+    return () => {
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
+    };
+  }, [leafletLoaded, resolvedTheme]);
+
   const [listings, setListings] = useState<FoodListing[]>([
     {
       id: "1",
@@ -163,16 +256,8 @@ export default function NgoDashboard() {
           <section className="flex-1 h-[calc(100vh-60px)] relative p-6 bg-surface-container/20">
             <div className="w-full h-full rounded-3xl overflow-hidden shadow-2xl border border-outline-variant/30 relative">
               
-              {/* Map Background Placeholder */}
-              <div
-                className="absolute inset-0 bg-surface-dim grayscale dark:brightness-[0.4] dark:contrast-[1.2]"
-                style={{
-                  backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuAhj4aPri8p7rLgfgaiveIVdAL3oVEPL4WvRjoxRu900cM6kEOV7QBXlnLEtWH9faLRkuw1DnScpuGaLBM9hWLMawzPJD1U9i-J5qxuuwyzBEVl0_cy0wouB41_Vo-8Tk5-wRN0f9mYYaAvsPDvdwIrmnnd2z5u9B2huC0eFU-awrTADotXbWbJ3EfP09F5XGAdLTZvO1IQIwXhTUf37eU21SrFwTQbwLAQemsP2E1msHI826If4eThnw')",
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                }}
-                aria-label="Map showing active listings in India"
-              />
+              {/* Leaflet map container */}
+              <div id="leaflet-map-container" className="absolute inset-0 w-full h-full z-0" />
 
               {/* Floating Map Controls */}
               <div className="absolute top-6 right-6 flex flex-col space-y-2 z-20">
@@ -214,28 +299,6 @@ export default function NgoDashboard() {
                       <span className="text-xl font-headline font-bold text-primary">3,842</span>
                       <span className="text-xs text-on-surface font-semibold">meals today</span>
                     </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Map Markers */}
-              <div className="absolute top-1/4 left-1/3 z-10">
-                <div className="relative flex items-center justify-center cursor-pointer">
-                  <div className="absolute w-12 h-12 bg-primary/30 rounded-full animate-ping"></div>
-                  <div className="w-10 h-10 bg-primary border-[3px] border-surface rounded-full shadow-[0_0_15px_rgba(107,251,154,0.6)] flex items-center justify-center text-on-primary">
-                    <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>
-                      restaurant
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="absolute top-1/2 left-1/2 z-10">
-                <div className="relative flex items-center justify-center cursor-pointer">
-                  <div className="w-10 h-10 bg-secondary border-[3px] border-surface rounded-full shadow-[0_0_15px_rgba(174,206,190,0.4)] flex items-center justify-center text-on-secondary">
-                    <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>
-                      shopping_basket
-                    </span>
                   </div>
                 </div>
               </div>

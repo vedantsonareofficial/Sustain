@@ -28,7 +28,7 @@ export function EarthGlobeDark() {
       uniforms: {
         uDayTex: { value: null as THREE.Texture | null },
         uNightTex: { value: null as THREE.Texture | null },
-        uSunDirection: { value: new THREE.Vector3(5, 3, 5).normalize() },
+        uSunDirection: { value: new THREE.Vector3(3, 2, 5).normalize() },
       },
       vertexShader: `
         varying vec2 vUv;
@@ -49,8 +49,8 @@ export function EarthGlobeDark() {
           vec3 dayColor = texture2D(uDayTex, vUv).rgb;
           vec3 nightColor = texture2D(uNightTex, vUv).rgb;
           float cosineAngle = dot(vNormal, uSunDirection);
-          float dayWeight = smoothstep(-0.2, 0.2, cosineAngle);
-          vec3 color = mix(nightColor, dayColor, dayWeight);
+          float dayWeight = smoothstep(-0.4, 0.4, cosineAngle);
+          vec3 color = mix(nightColor, dayColor * 0.95, dayWeight);
           gl_FragColor = vec4(color, 1.0);
         }
       `,
@@ -59,8 +59,8 @@ export function EarthGlobeDark() {
     const AtmosphereShader = {
       uniforms: {
         glowColor: { value: new THREE.Color("#4ADE80") },
-        coefficient: { value: 0.1 },
-        power: { value: 4.0 },
+        coefficient: { value: 0.06 },
+        power: { value: 4.5 },
       },
       vertexShader: `
         varying vec3 vNormal;
@@ -79,7 +79,7 @@ export function EarthGlobeDark() {
         varying vec3 vNormal;
         varying vec3 vViewDir;
         void main() {
-          float intensity = pow(coefficient + dot(vNormal, vViewDir), power);
+          float intensity = pow(1.0 + dot(vNormal, vViewDir), power);
           gl_FragColor = vec4(glowColor, intensity);
         }
       `,
@@ -129,9 +129,11 @@ export function EarthGlobeDark() {
     const cloudGeom = new THREE.SphereGeometry(GLOBE_RADIUS + 0.02, 64, 64);
     const cloudMat = new THREE.MeshStandardMaterial({
       transparent: true,
-      opacity: 0.3,
+      opacity: 0.2,
       depthWrite: false,
       blending: THREE.NormalBlending,
+      roughness: 1.0,
+      metalness: 0.0,
     });
     const clouds = new THREE.Mesh(cloudGeom, cloudMat);
     textureLoader.load(
@@ -172,10 +174,10 @@ export function EarthGlobeDark() {
     scene.add(stars);
 
     // 5. Lighting
-    const sun = new THREE.DirectionalLight(0xffffff, 1.5);
-    sun.position.set(5, 3, 5);
+    const sun = new THREE.DirectionalLight(0xffffff, 0.8);
+    sun.position.set(3, 2, 5);
     scene.add(sun);
-    scene.add(new THREE.AmbientLight(0x404040, 0.5));
+    scene.add(new THREE.AmbientLight(0x404040, 0.4));
 
     // 6. Pulsating markers
     const markersData = [

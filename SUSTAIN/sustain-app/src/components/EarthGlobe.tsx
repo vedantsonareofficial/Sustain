@@ -33,7 +33,7 @@ export function EarthGlobe() {
       uniforms: {
         uDayTex: { value: null as THREE.Texture | null },
         uNightTex: { value: null as THREE.Texture | null },
-        uSunDirection: { value: new THREE.Vector3(5, 3, 5).normalize() }
+        uSunDirection: { value: new THREE.Vector3(3, 2, 5).normalize() }
       },
       vertexShader: `
         varying vec2 vUv;
@@ -54,9 +54,9 @@ export function EarthGlobe() {
           vec3 dayColor = texture2D(uDayTex, vUv).rgb;
           vec3 nightColor = texture2D(uNightTex, vUv).rgb;
           float dotNL = dot(vNormal, uSunDirection);
-          float dayWeight = smoothstep(-0.2, 0.2, dotNL);
+          float dayWeight = smoothstep(-0.4, 0.4, dotNL);
           
-          vec3 color = mix(nightColor * 0.5, dayColor * 1.1, dayWeight);
+          vec3 color = mix(nightColor * 0.6, dayColor, dayWeight);
           gl_FragColor = vec4(color, 1.0);
         }
       `
@@ -65,8 +65,8 @@ export function EarthGlobe() {
     const AtmosphereShader = {
       uniforms: {
         glowColor: { value: new THREE.Color(ATMOSPHERE_COLOR) },
-        coefficient: { value: 0.15 },
-        power: { value: 3.5 }
+        coefficient: { value: 0.08 },
+        power: { value: 4.0 }
       },
       vertexShader: `
         varying vec3 vNormal;
@@ -85,7 +85,7 @@ export function EarthGlobe() {
         varying vec3 vNormal;
         varying vec3 vViewDir;
         void main() {
-          float intensity = pow(coefficient + dot(vNormal, vViewDir), power);
+          float intensity = pow(1.0 + dot(vNormal, vViewDir), power);
           gl_FragColor = vec4(glowColor, intensity);
         }
       `
