@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500&amp;family=Plus+Jakarta+Sans:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-tertiary-fixed-variant": "#454745",
+            "surface-variant": "#e5e2e1",
+            "on-error-container": "#93000a",
+            "on-surface": "#1b1b1b",
+            "inverse-primary": "#95d4ac",
+            "surface-container-lowest": "#ffffff",
+            "on-secondary-container": "#007439",
+            "error-container": "#ffdad6",
+            "error": "#ba1a1a",
+            "tertiary-container": "#454745",
+            "surface": "#fcf9f8",
+            "tertiary-fixed-dim": "#c6c7c4",
+            "surface-container-highest": "#e5e2e1",
+            "secondary": "#006d36",
+            "primary-fixed": "#b0f1c7",
+            "outline": "#707971",
+            "on-primary-fixed-variant": "#0f5132",
+            "surface-tint": "#2d6a48",
+            "surface-dim": "#dcd9d9",
+            "on-primary": "#ffffff",
+            "on-background": "#1b1b1b",
+            "surface-container": "#f0eded",
+            "secondary-fixed-dim": "#4de082",
+            "on-secondary-fixed-variant": "#005227",
+            "on-secondary-fixed": "#00210c",
+            "on-tertiary": "#ffffff",
+            "primary": "#003820",
+            "tertiary-fixed": "#e2e3e0",
+            "primary-fixed-dim": "#95d4ac",
+            "on-tertiary-fixed": "#1a1c1b",
+            "background": "#fcf9f8",
+            "surface-container-low": "#f6f3f2",
+            "outline-variant": "#c0c9c0",
+            "on-surface-variant": "#404942",
+            "secondary-fixed": "#6dfe9c",
+            "on-tertiary-container": "#b4b5b2",
+            "tertiary": "#2f312f",
+            "secondary-container": "#6dfe9c",
+            "on-primary-fixed": "#002111",
+            "on-error": "#ffffff",
+            "inverse-on-surface": "#f3f0ef",
+            "surface-container-high": "#eae7e7",
+            "surface-bright": "#fcf9f8",
+            "on-primary-container": "#84c39b",
+            "primary-container": "#0f5132",
+            "on-secondary": "#ffffff",
+            "inverse-surface": "#313030"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "margin-mobile": "20px",
+            "xs": "4px",
+            "md": "24px",
+            "sm": "12px",
+            "margin-desktop": "120px",
+            "xl": "64px",
+            "gutter": "16px",
+            "lg": "40px",
+            "base": "8px"
+          },
+          "fontFamily": {
+            "body-md": ["Fira Sans"],
+            "body-lg": ["Fira Sans"],
+            "label-md": ["Fira Sans"],
+            "headline-lg": ["Plus Jakarta Sans"],
+            "headline-md": ["Plus Jakarta Sans"],
+            "headline-lg-mobile": ["Plus Jakarta Sans"],
+            "display-lg": ["Plus Jakarta Sans"],
+            "caption": ["Fira Sans"]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #fcf9f8;
+    }
+  </style>
+</head>
+<body class="font-body-md text-on-surface">
+<!-- ThreeJS Background Layer -->
+<div class="fixed inset-0 w-full h-full bg-transparent" id="threejs-container-ANIMATION_GLOW_LIGHT"></div>
+<!-- UI Overlay -->
+<div class="relative z-10 w-full h-full flex flex-col pointer-events-none">
+<!-- Header/Navigation -->
+<header class="p-md lg:px-margin-desktop flex justify-between items-center pointer-events-auto">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 bg-primary-container flex items-center justify-center text-on-primary-container rounded-lg font-bold">S</div>
+<span class="text-headline-md text-on-surface font-headline-md tracking-tight">Sustain</span>
+</div>
+<nav class="hidden md:flex items-center gap-md">
+<a class="text-on-surface/80 hover:text-primary transition-colors font-medium" href="#">Network</a>
+<a class="text-on-surface/80 hover:text-primary transition-colors font-medium" href="#">Impact</a>
+<a class="bg-primary-container text-on-primary-container px-md py-xs rounded-full hover:bg-opacity-90 transition-all font-medium" href="#">Sign In</a>
+</nav>
+</header>
+<!-- Content Area -->
+<main class="flex-grow flex items-end p-md lg:px-margin-desktop lg:pb-xl">
+<div class="max-w-xl pointer-events-auto">
+<div class="inline-block px-3 py-1 bg-secondary-container/20 border border-secondary/20 rounded-full mb-base">
+<span class="text-on-secondary-container text-label-md flex items-center gap-2">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-secondary"></span>
+</span>
+            Real-time Monitoring
+          </span>
+</div>
+<h1 class="text-display-lg text-on-surface font-display-lg mb-sm leading-tight">
+          Precision Surplus Recovery Tracking
+        </h1>
+<p class="text-body-lg text-on-surface-variant mb-md">
+          A high-precision geographic tool mapping food surplus and recovery efforts across India. Monitor efficiency, reduce waste, and visualize impact in real-time.
+        </p>
+<div class="flex flex-wrap gap-sm">
+<button class="bg-primary-container text-on-primary-container px-xl py-sm rounded-lg font-bold hover:scale-105 transition-transform">
+            View Regional Data
+          </button>
+<button class="bg-surface-container border border-outline/20 text-on-surface px-xl py-sm rounded-lg font-bold hover:bg-surface-container-high transition-all">
+            Join the Network
+          </button>
+</div>
+</div>
+</main>
+<!-- Footer Stats -->
+<footer class="p-md lg:px-margin-desktop bg-surface/80 backdrop-blur-xl border-t border-outline/10 pointer-events-auto">
+<div class="flex flex-wrap justify-between items-center gap-md">
+<div class="flex gap-xl">
+<div>
+<div class="text-on-surface text-headline-md font-bold">42.5k</div>
+<div class="text-on-surface-variant text-caption uppercase tracking-wider">Recovery Points</div>
+</div>
+<div>
+<div class="text-on-surface text-headline-md font-bold">1.2M</div>
+<div class="text-on-surface-variant text-caption uppercase tracking-wider">Meals Saved Monthly</div>
+</div>
+</div>
+<div class="text-on-surface-variant/60 text-label-md flex items-center gap-2">
+<span>Active Hubs: Mumbai, Delhi, Bangalore, Chennai</span>
+</div>
+</div>
+</footer>
+</div>
+<script>
+    /**
+     * Sustain - EarthGlobe.tsx (ANIMATION_GLOW_LIGHT)
+     * Optimized for light mode and DESIGN_SYSTEM_2
+     */
+    (function() {
+      const container = document.getElementById('threejs-container-ANIMATION_GLOW_LIGHT');
+      const width = container.clientWidth || window.innerWidth;
+      const height = container.clientHeight || window.innerHeight;
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      renderer.setSize(width, height);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      container.appendChild(renderer.domElement);
+
+      // --- Constants & Config ---
+      const GLOBE_RADIUS = 2;
+      const BORDER_RADIUS = 2.005;
+      const MARKER_RADIUS = 2.04;
+      const BRAND_GREEN = '#0F5132'; // DESIGN_SYSTEM_2 primary variant
+      const BORDER_SUBTLE = '#707971'; // outline color
+      const ATMOSPHERE_COLOR = '#4ade80'; 
+      
+      // --- Shaders ---
+      const EarthShader = {
+        uniforms: {
+          uDayTex: { value: null },
+          uNightTex: { value: null },
+          uSunDirection: { value: new THREE.Vector3(5, 3, 5).normalize() }
+        },
+        vertexShader: `
+          varying vec2 vUv;
+          varying vec3 vNormal;
+          void main() {
+            vUv = uv;
+            vNormal = normalize(normalMatrix * normal);
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          }
+        `,
+        fragmentShader: `
+          uniform sampler2D uDayTex;
+          uniform sampler2D uNightTex;
+          uniform vec3 uSunDirection;
+          varying vec2 vUv;
+          varying vec3 vNormal;
+          void main() {
+            vec3 dayColor = texture2D(uDayTex, vUv).rgb;
+            vec3 nightColor = texture2D(uNightTex, vUv).rgb;
+            float dotNL = dot(vNormal, uSunDirection);
+            float dayWeight = smoothstep(-0.2, 0.2, dotNL);
+            
+            vec3 color = mix(nightColor * 0.5, dayColor * 1.1, dayWeight);
+            gl_FragColor = vec4(color, 1.0);
+          }
+        `
+      };
+
+      const AtmosphereShader = {
+        uniforms: {
+          glowColor: { value: new THREE.Color(ATMOSPHERE_COLOR) },
+          coefficient: { value: 0.15 },
+          power: { value: 3.5 }
+        },
+        vertexShader: `
+          varying vec3 vNormal;
+          varying vec3 vViewDir;
+          void main() {
+            vNormal = normalize(normalMatrix * normal);
+            vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+            vViewDir = normalize(-mvPosition.xyz);
+            gl_Position = projectionMatrix * mvPosition;
+          }
+        `,
+        fragmentShader: `
+          uniform vec3 glowColor;
+          uniform float coefficient;
+          uniform float power;
+          varying vec3 vNormal;
+          varying vec3 vViewDir;
+          void main() {
+            float intensity = pow(coefficient + dot(vNormal, vViewDir), power);
+            gl_FragColor = vec4(glowColor, intensity);
+          }
+        `
+      };
+
+      const latLongToVector3 = (lat, lng, radius) => {
+        const phi = (90 - lat) * (Math.PI / 180);
+        const theta = (lng + 180) * (Math.PI / 180);
+        return new THREE.Vector3(
+          -radius * Math.sin(phi) * Math.cos(theta),
+          radius * Math.cos(phi),
+          radius * Math.sin(phi) * Math.sin(theta)
+        );
+      };
+
+      const textureLoader = new THREE.TextureLoader();
+      const globeGroup = new THREE.Group();
+      scene.add(globeGroup);
+
+      // 1. Earth
+      const earthGeom = new THREE.SphereGeometry(GLOBE_RADIUS, 64, 64);
+      const earthMat = new THREE.ShaderMaterial({
+        uniforms: THREE.UniformsUtils.clone(EarthShader.uniforms),
+        vertexShader: EarthShader.vertexShader,
+        fragmentShader: EarthShader.fragmentShader
+      });
+      const earth = new THREE.Mesh(earthGeom, earthMat);
+      globeGroup.add(earth);
+
+      textureLoader.load('https://raw.githubusercontent.com/turban/webgl-earth/master/images/2_no_clouds_4k.jpg', (tex) => earthMat.uniforms.uDayTex.value = tex);
+      textureLoader.load('https://raw.githubusercontent.com/turban/webgl-earth/master/images/earth-night-4k.jpg', (tex) => earthMat.uniforms.uNightTex.value = tex);
+
+      // 2. Atmosphere
+      const atmosGeom = new THREE.SphereGeometry(GLOBE_RADIUS + 0.1, 64, 64);
+      const atmosMat = new THREE.ShaderMaterial({
+        uniforms: THREE.UniformsUtils.clone(AtmosphereShader.uniforms),
+        vertexShader: AtmosphereShader.vertexShader,
+        fragmentShader: AtmosphereShader.fragmentShader,
+        side: THREE.BackSide,
+        transparent: true,
+        blending: THREE.AdditiveBlending
+      });
+      const atmosphere = new THREE.Mesh(atmosGeom, atmosMat);
+      scene.add(atmosphere);
+
+      // 3. Borders
+      const borderGroup = new THREE.Group();
+      globeGroup.add(borderGroup);
+
+      const loadBorders = async () => {
+        try {
+          const response = await fetch('https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_110m_admin_0_countries.geojson');
+          const data = await response.json();
+          
+          data.features.forEach(feature => {
+            const isIndia = feature.properties.NAME === 'India' || feature.properties.ISO_A3 === 'IND';
+            const color = isIndia ? BRAND_GREEN : BORDER_SUBTLE;
+            const opacity = isIndia ? 1.0 : 0.25;
+
+            const renderPoly = (points) => {
+              const vertices = [];
+              points.forEach(p => {
+                const v = latLongToVector3(p[1], p[0], BORDER_RADIUS);
+                vertices.push(v.x, v.y, v.z);
+              });
+              const geometry = new THREE.BufferGeometry();
+              geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+              const material = new THREE.LineBasicMaterial({ color, transparent: true, opacity });
+              const line = new THREE.Line(geometry, material);
+              borderGroup.add(line);
+            };
+
+            if (feature.geometry.type === 'Polygon') {
+              renderPoly(feature.geometry.coordinates[0]);
+            } else if (feature.geometry.type === 'MultiPolygon') {
+              feature.geometry.coordinates.forEach(poly => renderPoly(poly[0]));
+            }
+          });
+        } catch (e) { console.error(e); }
+      };
+      loadBorders();
+
+      // 4. Markers
+      const markersData = [
+        { name: "Mumbai", lat: 19.0760, lng: 72.8777 },
+        { name: "Delhi", lat: 28.7041, lng: 77.1025 },
+        { name: "Bengaluru", lat: 12.9716, lng: 77.5946 },
+        { name: "Chennai", lat: 13.0827, lng: 80.2707 },
+        { name: "Kolkata", lat: 22.5726, lng: 88.3639 }
+      ];
+
+      const markerGeom = new THREE.SphereGeometry(0.025, 16, 16);
+      const markerMat = new THREE.MeshBasicMaterial({ color: BRAND_GREEN });
+
+      markersData.forEach(m => {
+        const pos = latLongToVector3(m.lat, m.lng, MARKER_RADIUS);
+        const mesh = new THREE.Mesh(markerGeom, markerMat);
+        mesh.position.copy(pos);
+        mesh.userData = { name: m.name, lat: m.lat, lng: m.lng };
+        globeGroup.add(mesh);
+        
+        const pulseGeom = new THREE.SphereGeometry(0.04, 16, 16);
+        const pulseMat = new THREE.MeshBasicMaterial({ color: BRAND_GREEN, transparent: true, opacity: 0.4 });
+        const pulse = new THREE.Mesh(pulseGeom, pulseMat);
+        pulse.position.copy(pos);
+        globeGroup.add(pulse);
+        mesh.pulse = pulse;
+      });
+
+      // Camera settings
+      camera.position.copy(latLongToVector3(22, 79, 10));
+      camera.lookAt(0,0,0);
+
+      let targetCameraPos = latLongToVector3(22, 79, 6.5);
+      let isMoving = true;
+
+      const animate = () => {
+        requestAnimationFrame(animate);
+        const now = Date.now();
+        
+        if (isMoving && targetCameraPos) {
+          camera.position.lerp(targetCameraPos, 0.03);
+          camera.lookAt(0,0,0);
+          if (camera.position.distanceTo(targetCameraPos) < 0.05) isMoving = false;
+        } else {
+          globeGroup.rotation.y += 0.0008;
+        }
+
+        globeGroup.children.forEach(c => {
+          if (c.pulse) {
+            const s = 1 + Math.sin(now * 0.005) * 0.5;
+            c.pulse.scale.set(s, s, s);
+            c.pulse.material.opacity = 0.4 * (1 - (s-1));
+          }
+        });
+
+        renderer.render(scene, camera);
+      };
+      animate();
+
+      window.addEventListener('resize', () => {
+        const w = container.clientWidth || window.innerWidth;
+        const h = container.clientHeight || window.innerHeight;
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+        renderer.setSize(w, h);
+      });
+    })();
+  </script>
+</body></html>

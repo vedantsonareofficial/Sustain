@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>NGO Logistics Portal | FoodBridge</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Fira+Sans:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Load Tailwind Config -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-surface": "#dbe5dd",
+                    "inverse-primary": "#006d36",
+                    "on-primary": "#003919",
+                    "on-background": "#dbe5dd",
+                    "primary": "#6bfb9a",
+                    "background": "#0c1511",
+                    "outline": "#869486",
+                    "surface-variant": "#2d3732",
+                    "tertiary-fixed": "#c9ead7",
+                    "on-secondary-fixed": "#032017",
+                    "surface-tint": "#4de082",
+                    "surface-container-highest": "#2d3732",
+                    "on-error": "#690005",
+                    "surface-container-high": "#232c27",
+                    "error-container": "#93000a",
+                    "inverse-on-surface": "#29322d",
+                    "on-secondary-container": "#a0bfb0",
+                    "surface": "#0c1511",
+                    "tertiary-fixed-dim": "#adcebc",
+                    "surface-dim": "#0c1511",
+                    "secondary-fixed-dim": "#aecebe",
+                    "on-tertiary-fixed-variant": "#2f4d3f",
+                    "inverse-surface": "#dbe5dd",
+                    "surface-container-lowest": "#07100c",
+                    "secondary": "#aecebe",
+                    "on-surface-variant": "#bccabb",
+                    "on-tertiary-container": "#3a5749",
+                    "tertiary": "#c7e8d5",
+                    "on-tertiary": "#193629",
+                    "tertiary-container": "#abccba",
+                    "secondary-container": "#334f43",
+                    "surface-container-low": "#141d19",
+                    "primary-fixed": "#6dfe9c",
+                    "on-primary-container": "#005e2d",
+                    "primary-container": "#4ade80",
+                    "error": "#ffb4ab",
+                    "on-secondary": "#1a362b",
+                    "surface-container": "#18221d",
+                    "on-error-container": "#ffdad6",
+                    "on-secondary-fixed-variant": "#304c41",
+                    "secondary-fixed": "#caeada",
+                    "surface-bright": "#323b36",
+                    "outline-variant": "#3d4a3e",
+                    "on-primary-fixed": "#00210c",
+                    "on-tertiary-fixed": "#022015",
+                    "on-primary-fixed-variant": "#005227",
+                    "primary-fixed-dim": "#4de082"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "lg": "40px",
+                    "base": "8px",
+                    "sm": "12px",
+                    "xs": "4px",
+                    "xl": "64px",
+                    "margin-mobile": "20px",
+                    "gutter": "16px",
+                    "md": "24px",
+                    "margin-desktop": "120px"
+            },
+            "fontFamily": {
+                    "headline-lg": ["Plus Jakarta Sans"],
+                    "body-md": ["Fira Sans"],
+                    "display-lg": ["Plus Jakarta Sans"],
+                    "headline-md": ["Plus Jakarta Sans"],
+                    "headline-lg-mobile": ["Plus Jakarta Sans"],
+                    "caption": ["Fira Sans"],
+                    "body-lg": ["Fira Sans"],
+                    "label-md": ["Fira Sans"]
+            },
+            "fontSize": {
+                    "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                    "caption": ["12px", {"lineHeight": "1.4", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "label-md": ["14px", {"lineHeight": "1.4", "letterSpacing": "0.01em", "fontWeight": "500"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #0c1511;
+            font-family: 'Fira Sans', sans-serif;
+            position: relative;
+        }
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("https://www.transparenttextures.com/patterns/leaf.png");
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .active-nav-item {
+            transform: translateX(4px);
+        }
+        .food-card-glass {
+            background: rgba(24, 34, 29, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(107, 251, 154, 0.1);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #3d4a3e;
+            border-radius: 10px;
+        }
+        .forest-gradient-btn {
+            background: linear-gradient(135deg, #005e2d 0%, #4de082 100%);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .forest-gradient-btn:hover {
+            opacity: 0.95;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(107, 251, 154, 0.2);
+        }
+        .pulse-soft {
+            animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse-ring {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+    </style>
+</head>
+<body class="antialiased text-on-surface">
+<!-- Sidebar Navigation Shell -->
+<aside class="h-screen w-64 fixed left-0 top-0 bg-surface border-r border-outline-variant/30 flex flex-col p-4 space-y-2 z-50 shadow-2xl">
+<div class="px-4 py-6 mb-4">
+<h1 class="text-headline-md font-headline-md font-bold text-primary">Sustain</h1>
+<p class="font-label-md text-label-md text-on-surface-variant">Logistics Portal</p>
+</div>
+<nav class="flex-1 space-y-1">
+<!-- Dashboard Tab (Active) -->
+<a class="flex items-center space-x-3 bg-primary/10 text-primary font-bold rounded-lg px-4 py-3 active-nav-item group transition-transform duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center space-x-3 text-on-surface-variant px-4 py-3 hover:bg-surface-container-high rounded-lg transition-all duration-200 group" href="#">
+<span class="material-symbols-outlined" data-icon="local_shipping">local_shipping</span>
+<span class="font-label-md text-label-md">Active Rescues</span>
+</a>
+<a class="flex items-center space-x-3 text-on-surface-variant px-4 py-3 hover:bg-surface-container-high rounded-lg transition-all duration-200 group" href="#">
+<span class="material-symbols-outlined" data-icon="handshake">handshake</span>
+<span class="font-label-md text-label-md">Partners</span>
+</a>
+<a class="flex items-center space-x-3 text-on-surface-variant px-4 py-3 hover:bg-surface-container-high rounded-lg transition-all duration-200 group" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="font-label-md text-label-md">Impact Analytics</span>
+</a>
+<a class="flex items-center space-x-3 text-on-surface-variant px-4 py-3 hover:bg-surface-container-high rounded-lg transition-all duration-200 group" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+</nav>
+<div class="pt-4 border-t border-outline-variant/30">
+<button class="w-full forest-gradient-btn text-on-primary py-3 px-4 rounded-xl font-label-md text-label-md flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[20px]" data-icon="add_box">add_box</span>
+            Post New Surplus
+        </button>
+<div class="mt-6 flex items-center px-4 space-x-3">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest overflow-hidden border border-outline-variant/50">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a female NGO operations manager in a high-tech office setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCxDJzZQNmCUfHooukG0c_2uxeldD4ADtcJSz7dOXZaz6kvobK2kOmO26xTZshPJfuXckJa5Sd3r08YKsNg8TMXDBhN5x7O-QsrogGMZDEnhB3oocJWgNDMLb_kIbFXIJK_kvrs8IUnPZ3VJNYs6NgUiSyEEAEpiYskx4yyO-RebStdFHBT4elvnMVz98iyup2ggwktx7AkR3MeflbG_YZkvRhB3p2dWc065BFLGmU9z085q40ASHETHA"/>
+</div>
+<div class="flex-1 overflow-hidden">
+<p class="text-label-md font-bold truncate text-on-surface">City Harvest</p>
+<p class="text-caption text-on-surface-variant truncate">Lead Logistics</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-64 min-h-screen flex flex-col md:flex-row relative z-10">
+<!-- Left Panel: Listings (40%) -->
+<section class="w-full md:w-[40%] h-screen overflow-hidden flex flex-col border-r border-outline-variant/30 bg-surface-container-low">
+<header class="p-md bg-surface shrink-0 z-20 border-b border-outline-variant/20">
+<div class="flex justify-between items-end mb-4">
+<div>
+<h2 class="font-headline-md text-headline-md text-primary">Live Surplus Feed</h2>
+<p class="font-label-md text-label-md text-on-surface-variant">Nearby pickup opportunities</p>
+</div>
+<div class="flex space-x-2">
+<button class="p-2 rounded-full hover:bg-surface-container-high transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="tune">tune</span>
+</button>
+</div>
+</div>
+<!-- Search -->
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" data-icon="search">search</span>
+<input class="w-full pl-10 pr-4 py-3 bg-surface-container-lowest border border-outline-variant/30 rounded-xl focus:ring-2 focus:ring-primary/20 focus:outline-none font-body-md text-body-md transition-all text-on-surface placeholder-on-surface-variant/50" placeholder="Search by location or food type..." type="text"/>
+</div>
+</header>
+<!-- Scrollable List Area -->
+<div class="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar pb-10">
+<!-- Card 1 -->
+<article class="food-card-glass p-md rounded-2xl shadow-lg hover:shadow-primary/5 hover:-translate-y-1 transition-all cursor-pointer relative z-10">
+<div class="flex justify-between items-start mb-3">
+<div class="flex items-center bg-primary/10 text-primary font-bold px-3 py-1 rounded-full text-caption border border-primary/20">
+<span class="material-symbols-outlined text-[14px] mr-1" data-icon="timer">timer</span>
+                        45m left
+                    </div>
+<span class="text-label-md font-bold text-on-surface-variant">2.5km away</span>
+</div>
+<h3 class="font-headline-md text-[20px] text-on-surface mb-1">Assorted Fresh Produce</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-4">Port Authority Market • Grade A</p>
+<div class="flex items-center space-x-4 mb-4">
+<div class="flex flex-col">
+<span class="text-caption text-on-surface-variant font-semibold uppercase tracking-wider">Quantity</span>
+<span class="font-bold text-primary">For 150 people</span>
+</div>
+<div class="h-8 w-px bg-outline-variant/30"></div>
+<div class="flex flex-col">
+<span class="text-caption text-on-surface-variant font-semibold uppercase tracking-wider">Weight</span>
+<span class="font-bold text-primary">~75kg</span>
+</div>
+</div>
+<button class="w-full forest-gradient-btn text-on-primary py-3 rounded-lg font-bold flex items-center justify-center gap-2">
+                    Claim Pickup
+                    <span class="material-symbols-outlined" data-icon="chevron_right">chevron_right</span>
+</button>
+</article>
+<!-- Card 2 -->
+<article class="food-card-glass p-md rounded-2xl shadow-lg hover:shadow-primary/5 hover:-translate-y-1 transition-all cursor-pointer relative z-10">
+<div class="flex justify-between items-start mb-3">
+<div class="flex items-center bg-error-container text-on-error-container font-bold px-3 py-1 rounded-full text-caption pulse-soft border border-error/20">
+<span class="material-symbols-outlined text-[14px] mr-1" data-icon="warning">warning</span>
+                        12m left
+                    </div>
+<span class="text-label-md font-bold text-on-surface-variant">0.8km away</span>
+</div>
+<h3 class="font-headline-md text-[20px] text-on-surface mb-1">Artisan Breads &amp; Pastries</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-4">Bakery Corner • Downtown</p>
+<div class="flex items-center space-x-4 mb-4">
+<div class="flex flex-col">
+<span class="text-caption text-on-surface-variant font-semibold uppercase tracking-wider">Quantity</span>
+<span class="font-bold text-primary">For 60 people</span>
+</div>
+<div class="h-8 w-px bg-outline-variant/30"></div>
+<div class="flex flex-col">
+<span class="text-caption text-on-surface-variant font-semibold uppercase tracking-wider">Weight</span>
+<span class="font-bold text-primary">~20kg</span>
+</div>
+</div>
+<button class="w-full forest-gradient-btn text-on-primary py-3 rounded-lg font-bold flex items-center justify-center gap-2">
+                    Claim Pickup
+                    <span class="material-symbols-outlined" data-icon="chevron_right">chevron_right</span>
+</button>
+</article>
+<!-- Card 3 -->
+<article class="food-card-glass p-md rounded-2xl shadow-lg hover:shadow-primary/5 hover:-translate-y-1 transition-all cursor-pointer relative z-10">
+<div class="flex justify-between items-start mb-3">
+<div class="flex items-center bg-primary/10 text-primary font-bold px-3 py-1 rounded-full text-caption border border-primary/20">
+<span class="material-symbols-outlined text-[14px] mr-1" data-icon="schedule">schedule</span>
+                        2h 15m left
+                    </div>
+<span class="text-label-md font-bold text-on-surface-variant">4.2km away</span>
+</div>
+<h3 class="font-headline-md text-[20px] text-on-surface mb-1">Catered Lunch Platters</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-4">Tech-Core Corporate Hub</p>
+<div class="flex items-center space-x-4 mb-4">
+<div class="flex flex-col">
+<span class="text-caption text-on-surface-variant font-semibold uppercase tracking-wider">Quantity</span>
+<span class="font-bold text-primary">For 200 people</span>
+</div>
+<div class="h-8 w-px bg-outline-variant/30"></div>
+<div class="flex flex-col">
+<span class="text-caption text-on-surface-variant font-semibold uppercase tracking-wider">Weight</span>
+<span class="font-bold text-primary">~110kg</span>
+</div>
+</div>
+<button class="w-full forest-gradient-btn text-on-primary py-3 rounded-lg font-bold flex items-center justify-center gap-2">
+                    Claim Pickup
+                    <span class="material-symbols-outlined" data-icon="chevron_right">chevron_right</span>
+</button>
+</article>
+</div>
+</section>
+<!-- Right Panel: Map (60%) -->
+<section class="flex-1 h-screen relative bg-surface-container p-6 overflow-hidden">
+<div class="w-full h-full rounded-3xl overflow-hidden shadow-2xl border border-outline-variant/30 relative" id="map-canvas">
+<!-- Map Background Placeholder (Dark Themed Map Image) -->
+<div class="absolute inset-0 bg-surface-dim grayscale brightness-[0.4] contrast-[1.2]" data-alt="A dark themed zoomable map of India centered on the NGO's city, with logistics routes highlighted in vibrant forest green." data-location="India" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAhj4aPri8p7rLgfgaiveIVdAL3oVEPL4WvRjoxRu900cM6kEOV7QBXlnLEtWH9faLRkuw1DnScpuGaLBM9hWLMawzPJD1U9i-J5qxuuwyzBEVl0_cy0wouB41_Vo-8Tk5-wRN0f9mYYaAvsPDvdwIrmnnd2z5u9B2huC0eFU-awrTADotXbWbJ3EfP09F5XGAdLTZvO1IQIwXhTUf37eU21SrFwTQbwLAQemsP2E1msHI826If4eThnw')"></div>
+<!-- Floating Map Controls -->
+<div class="absolute top-6 right-6 flex flex-col space-y-2 z-20">
+<button class="w-12 h-12 bg-surface/90 backdrop-blur-md rounded-xl shadow-lg flex items-center justify-center text-primary hover:bg-surface-container-high transition-all border border-outline-variant/30">
+<span class="material-symbols-outlined" data-icon="my_location">my_location</span>
+</button>
+<button class="w-12 h-12 bg-surface/90 backdrop-blur-md rounded-xl shadow-lg flex items-center justify-center text-primary hover:bg-surface-container-high transition-all border border-outline-variant/30">
+<span class="material-symbols-outlined" data-icon="layers">layers</span>
+</button>
+</div>
+<!-- Active Rescue Stats Overlay -->
+<div class="absolute bottom-6 left-6 right-6 pointer-events-none z-20">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 pointer-events-auto">
+<div class="bg-surface/80 backdrop-blur-md p-4 rounded-2xl shadow-xl border border-outline-variant/30">
+<p class="text-caption text-on-surface-variant font-bold uppercase">Today's Goal</p>
+<div class="flex items-center justify-between mt-1">
+<span class="text-headline-md text-primary">1,250 kg</span>
+<span class="text-secondary font-bold text-label-md">82%</span>
+</div>
+<div class="w-full h-2 bg-surface-container-high rounded-full mt-2">
+<div class="h-full bg-primary rounded-full shadow-[0_0_8px_rgba(107,251,154,0.5)]" style="width: 82%"></div>
+</div>
+</div>
+<div class="bg-surface/80 backdrop-blur-md p-4 rounded-2xl shadow-xl border border-outline-variant/30 flex flex-col justify-center">
+<p class="text-caption text-on-surface-variant font-bold uppercase">Active Vehicles</p>
+<div class="flex items-center space-x-2 mt-1">
+<span class="text-headline-md text-primary">4</span>
+<span class="material-symbols-outlined text-secondary" data-icon="local_shipping" style="font-variation-settings: 'FILL' 1;">local_shipping</span>
+</div>
+</div>
+<div class="bg-surface/80 backdrop-blur-md p-4 rounded-2xl shadow-xl border border-outline-variant/30 flex flex-col justify-center">
+<p class="text-caption text-on-surface-variant font-bold uppercase">Estimated Impact</p>
+<div class="flex items-center space-x-2 mt-1">
+<span class="text-headline-md text-primary">3,842</span>
+<span class="text-label-md text-on-surface font-semibold">meals today</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Custom Marker Illustration -->
+<div class="absolute top-1/4 left-1/3 z-10">
+<div class="relative flex items-center justify-center">
+<div class="absolute w-12 h-12 bg-primary/40 rounded-full animate-ping"></div>
+<div class="w-10 h-10 bg-primary border-[3px] border-surface-container-highest rounded-full shadow-[0_0_15px_rgba(107,251,154,0.6)] flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary text-[20px]" data-icon="restaurant" style="font-variation-settings: 'FILL' 1;">restaurant</span>
+</div>
+</div>
+</div>
+<div class="absolute top-1/2 left-1/2 z-10">
+<div class="relative flex items-center justify-center">
+<div class="w-10 h-10 bg-secondary border-[3px] border-surface-container-highest rounded-full shadow-[0_0_15px_rgba(174,206,190,0.4)] flex items-center justify-center">
+<span class="material-symbols-outlined text-on-secondary text-[20px]" data-icon="shopping_basket" style="font-variation-settings: 'FILL' 1;">shopping_basket</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer Overlay -->
+<footer class="ml-64 bg-surface border-t border-outline-variant/30 relative z-10 p-6 flex flex-col md:flex-row justify-between items-center text-on-surface-variant">
+<p class="font-body-md text-body-md">© 2024 Sustain. Efficiency in abundance.</p>
+<div class="flex space-x-6 mt-4 md:mt-0">
+<a class="font-label-md text-label-md hover:text-primary transition-colors font-medium" href="#">Privacy Policy</a>
+<a class="font-label-md text-label-md hover:text-primary transition-colors font-medium" href="#">Terms of Service</a>
+<a class="font-label-md text-label-md hover:text-primary transition-colors font-medium" href="#">Global Logistics Standards</a>
+</div>
+</footer>
+<!-- Annapurna AI Chatbot Widget -->
+<div class="fixed bottom-6 right-6 z-[100] flex flex-col items-end">
+<!-- Chat Window -->
+<div class="hidden mb-4 w-80 md:w-96 bg-surface rounded-2xl shadow-2xl border border-outline-variant overflow-hidden flex flex-col transition-all duration-300 transform translate-y-4 opacity-0" id="annapurna-chat-window">
+<!-- Header -->
+<div class="forest-gradient-btn p-4 text-on-primary flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">soup_kitchen</span>
+</div>
+<div>
+<h4 class="font-bold text-label-md">Annapurna AI</h4>
+<p class="text-caption opacity-90">Always here to help</p>
+</div>
+</div>
+<button class="hover:bg-white/10 rounded-full p-1" onclick="document.getElementById('annapurna-chat-window').classList.add('hidden')">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<!-- Chat Body -->
+<div class="h-80 overflow-y-auto p-4 space-y-4 bg-surface-container-lowest custom-scrollbar">
+<div class="flex items-start gap-2">
+<div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary text-[18px]">robot_2</span>
+</div>
+<div class="bg-surface-container p-3 rounded-2xl rounded-tl-none border border-outline-variant/20">
+<p class="text-body-md text-on-surface">Namaste! I'm Annapurna, your food rescue assistant. How can I help you optimize your logistics today?</p>
+</div>
+</div>
+</div>
+<!-- Quick Replies -->
+<div class="p-3 border-t border-outline-variant/20 bg-surface flex flex-wrap gap-2">
+<button class="px-3 py-1.5 rounded-full border border-primary/30 text-primary text-caption font-medium hover:bg-primary/5 transition-colors">Route Optimization</button>
+<button class="px-3 py-1.5 rounded-full border border-primary/30 text-primary text-caption font-medium hover:bg-primary/5 transition-colors">Claim Issues</button>
+<button class="px-3 py-1.5 rounded-full border border-primary/30 text-primary text-caption font-medium hover:bg-primary/5 transition-colors">Impact Report</button>
+</div>
+<!-- Input Area -->
+<div class="p-4 bg-surface border-t border-outline-variant/20 flex gap-2">
+<input class="flex-1 bg-surface-container-low border border-outline-variant/20 rounded-xl px-4 py-2 text-body-md focus:ring-2 focus:ring-primary/20 text-on-surface placeholder-on-surface-variant/50" placeholder="Type your message..." type="text"/>
+<button class="text-primary hover:scale-110 transition-transform">
+<span class="material-symbols-outlined">send</span>
+</button>
+</div>
+</div>
+<!-- Launcher Button -->
+<button class="w-14 h-14 forest-gradient-btn rounded-full shadow-[0_0_20px_rgba(107,251,154,0.3)] flex items-center justify-center text-on-primary hover:scale-110 transition-transform duration-200 group" onclick="const win = document.getElementById('annapurna-chat-window'); win.classList.toggle('hidden'); if(!win.classList.contains('hidden')){ setTimeout(() =&gt; { win.classList.remove('translate-y-4', 'opacity-0'); }, 10); }">
+<span class="material-symbols-outlined text-[28px] group-hover:rotate-12 transition-transform" style="font-variation-settings: 'FILL' 1;">soup_kitchen</span>
+</button>
+</div>
+<script>
+    // Micro-interactions for buttons
+    document.querySelectorAll('button').forEach(btn => {
+        btn.addEventListener('mousedown', () => {
+            btn.classList.add('scale-95');
+        });
+        btn.addEventListener('mouseup', () => {
+            btn.classList.remove('scale-95');
+        });
+        btn.addEventListener('mouseleave', () => {
+            btn.classList.remove('scale-95');
+        });
+    });
+
+    // Search bar focus effect
+    const searchInput = document.querySelector('input[type="text"]');
+    if (searchInput) {
+        searchInput.addEventListener('focus', () => {
+            searchInput.parentElement.classList.add('scale-[1.01]');
+            searchInput.parentElement.classList.add('shadow-primary/10');
+        });
+        searchInput.addEventListener('blur', () => {
+            searchInput.parentElement.classList.remove('scale-[1.01]');
+            searchInput.parentElement.classList.remove('shadow-primary/10');
+        });
+    }
+</script>
+</body></html>

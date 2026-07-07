@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500&amp;family=Plus+Jakarta+Sans:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-tertiary-fixed-variant": "#454745",
+            "surface-variant": "#e5e2e1",
+            "on-error-container": "#93000a",
+            "on-surface": "#1b1b1b",
+            "inverse-primary": "#95d4ac",
+            "surface-container-lowest": "#ffffff",
+            "on-secondary-container": "#007439",
+            "error-container": "#ffdad6",
+            "error": "#ba1a1a",
+            "tertiary-container": "#454745",
+            "surface": "#fcf9f8",
+            "tertiary-fixed-dim": "#c6c7c4",
+            "surface-container-highest": "#e5e2e1",
+            "secondary": "#006d36",
+            "primary-fixed": "#b0f1c7",
+            "outline": "#707971",
+            "on-primary-fixed-variant": "#0f5132",
+            "surface-tint": "#2d6a48",
+            "surface-dim": "#dcd9d9",
+            "on-primary": "#ffffff",
+            "on-background": "#1b1b1b",
+            "surface-container": "#f0eded",
+            "secondary-fixed-dim": "#4de082",
+            "on-secondary-fixed-variant": "#005227",
+            "on-secondary-fixed": "#00210c",
+            "on-tertiary": "#ffffff",
+            "primary": "#003820",
+            "tertiary-fixed": "#e2e3e0",
+            "primary-fixed-dim": "#95d4ac",
+            "on-tertiary-fixed": "#1a1c1b",
+            "background": "#fcf9f8",
+            "surface-container-low": "#f6f3f2",
+            "outline-variant": "#c0c9c0",
+            "on-surface-variant": "#404942",
+            "secondary-fixed": "#6dfe9c",
+            "on-tertiary-container": "#b4b5b2",
+            "tertiary": "#2f312f",
+            "secondary-container": "#6dfe9c",
+            "on-primary-fixed": "#002111",
+            "on-error": "#ffffff",
+            "inverse-on-surface": "#f3f0ef",
+            "surface-container-high": "#eae7e7",
+            "surface-bright": "#fcf9f8",
+            "on-primary-container": "#84c39b",
+            "primary-container": "#0f5132",
+            "on-secondary": "#ffffff",
+            "inverse-surface": "#313030"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "margin-mobile": "20px",
+            "xs": "4px",
+            "md": "24px",
+            "sm": "12px",
+            "margin-desktop": "120px",
+            "xl": "64px",
+            "gutter": "16px",
+            "lg": "40px",
+            "base": "8px"
+          },
+          "fontFamily": {
+            "body-md": ["Fira Sans"],
+            "body-lg": ["Fira Sans"],
+            "label-md": ["Fira Sans"],
+            "headline-lg": ["Plus Jakarta Sans"],
+            "headline-md": ["Plus Jakarta Sans"],
+            "headline-lg-mobile": ["Plus Jakarta Sans"],
+            "display-lg": ["Plus Jakarta Sans"],
+            "caption": ["Fira Sans"]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+    }
+  </style>
+</head>
+<body class="font-body-md text-on-surface">
+<!-- ThreeJS Background Layer -->
+<div class="fixed inset-0 w-full h-full bg-transparent" id="threejs-container-ANIMATION_21"></div>
+<!-- UI Overlay -->
+<div class="relative z-10 w-full h-full flex flex-col pointer-events-none">
+<!-- Header/Navigation -->
+<header class="p-md lg:px-margin-desktop flex justify-between items-center pointer-events-auto">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 bg-secondary rounded-lg flex items-center justify-center text-on-secondary font-bold">S</div>
+<span class="text-headline-md text-white font-headline-md tracking-tight">Sustain</span>
+</div>
+<nav class="hidden md:flex items-center gap-md">
+<a class="text-white hover:text-secondary-fixed transition-colors" href="#">Network</a>
+<a class="text-white hover:text-secondary-fixed transition-colors" href="#">Impact</a>
+<a class="bg-secondary text-white px-md py-xs rounded-full hover:bg-opacity-90 transition-all" href="#">Sign In</a>
+</nav>
+</header>
+<!-- Content Area -->
+<main class="flex-grow flex items-end p-md lg:px-margin-desktop lg:pb-xl">
+<div class="max-w-xl pointer-events-auto">
+<div class="inline-block px-3 py-1 bg-primary-container/30 border border-secondary-fixed/30 rounded-full mb-base">
+<span class="text-secondary-fixed text-label-md flex items-center gap-2">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary-fixed opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-secondary-fixed"></span>
+</span>
+            Real-time Monitoring
+          </span>
+</div>
+<h1 class="text-display-lg text-white font-display-lg mb-sm leading-tight">
+          Precision Surplus Recovery Tracking
+        </h1>
+<p class="text-body-lg text-white/80 mb-md">
+          A high-precision geographic tool mapping food surplus and recovery efforts across India. Monitor efficiency, reduce waste, and visualize impact in real-time.
+        </p>
+<div class="flex flex-wrap gap-sm">
+<button class="bg-secondary text-white px-xl py-sm rounded-lg font-bold hover:scale-105 transition-transform">
+            View Regional Data
+          </button>
+<button class="bg-white/10 backdrop-blur-md text-white border border-white/20 px-xl py-sm rounded-lg font-bold hover:bg-white/20 transition-all">
+            Join the Network
+          </button>
+</div>
+</div>
+</main>
+<!-- Footer Stats -->
+<footer class="p-md lg:px-margin-desktop bg-black/40 backdrop-blur-xl border-t border-white/5 pointer-events-auto">
+<div class="flex flex-wrap justify-between items-center gap-md">
+<div class="flex gap-xl">
+<div>
+<div class="text-secondary-fixed text-headline-md font-bold">42.5k</div>
+<div class="text-white/60 text-caption uppercase tracking-wider">Recovery Points</div>
+</div>
+<div>
+<div class="text-secondary-fixed text-headline-md font-bold">1.2M</div>
+<div class="text-white/60 text-caption uppercase tracking-wider">Meals Saved Monthly</div>
+</div>
+</div>
+<div class="text-white/40 text-label-md flex items-center gap-2">
+<span>Active Hubs: Mumbai, Delhi, Bangalore, Chennai</span>
+</div>
+</div>
+</footer>
+</div>
+<script>
+    /**
+     * Sustain - EarthGlobe.tsx (ANIMATION_21)
+     * High-precision geographic tool tracking surplus recovery
+     */
+    const container = document.getElementById('threejs-container-ANIMATION_21');
+    const width = container.clientWidth || window.innerWidth;
+    const height = container.clientHeight || window.innerHeight;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(width, height);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    container.appendChild(renderer.domElement);
+
+    // --- Shaders ---
+
+    const EarthShader = {
+      uniforms: {
+        uDayTex: { value: new THREE.Texture() },
+        uNightTex: { value: new THREE.Texture() },
+        uSunDirection: { value: new THREE.Vector3(5, 3, 5).normalize() }
+      },
+      vertexShader: `
+        varying vec2 vUv;
+        varying vec3 vNormal;
+        varying vec3 vViewPosition;
+        void main() {
+          vUv = uv;
+          vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+          vNormal = normalize(normalMatrix * normal);
+          vViewPosition = -mvPosition.xyz;
+          gl_Position = projectionMatrix * mvPosition;
+        }
+      `,
+      fragmentShader: `
+        uniform sampler2D uDayTex;
+        uniform sampler2D uNightTex;
+        uniform vec3 uSunDirection;
+        varying vec2 vUv;
+        varying vec3 vNormal;
+        void main() {
+          vec3 dayColor = texture2D(uDayTex, vUv).rgb;
+          vec3 nightColor = texture2D(uNightTex, vUv).rgb;
+          float cosineAngle = dot(vNormal, uSunDirection);
+          float dayWeight = smoothstep(-0.2, 0.2, cosineAngle);
+          vec3 color = mix(nightColor, dayColor, dayWeight);
+          gl_FragColor = vec4(color, 1.0);
+        }
+      `
+    };
+
+    const AtmosphereShader = {
+      uniforms: {
+        glowColor: { value: new THREE.Color('#4ADE80') },
+        coefficient: { value: 0.1 },
+        power: { value: 4.0 }
+      },
+      vertexShader: `
+        varying vec3 vNormal;
+        varying vec3 vViewDir;
+        void main() {
+          vNormal = normalize(normalMatrix * normal);
+          vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+          vViewDir = normalize(-mvPosition.xyz);
+          gl_Position = projectionMatrix * mvPosition;
+        }
+      `,
+      fragmentShader: `
+        uniform vec3 glowColor;
+        uniform float coefficient;
+        uniform float power;
+        varying vec3 vNormal;
+        varying vec3 vViewDir;
+        void main() {
+          float intensity = pow(coefficient + dot(vNormal, vViewDir), power);
+          gl_FragColor = vec4(glowColor, intensity);
+        }
+      `
+    };
+
+    // --- Utils ---
+
+    const latLongToVector3 = (lat, lng, radius) => {
+      const phi = (90 - lat) * (Math.PI / 180);
+      const theta = (lng + 180) * (Math.PI / 180);
+      return new THREE.Vector3(
+        -radius * Math.sin(phi) * Math.cos(theta),
+        radius * Math.cos(phi),
+        radius * Math.sin(phi) * Math.sin(theta)
+      );
+    };
+
+    // --- Scene Construction ---
+
+    const textureLoader = new THREE.TextureLoader();
+    const globeGroup = new THREE.Group();
+    scene.add(globeGroup);
+
+    // 1. Base Earth
+    const earthGeom = new THREE.SphereGeometry(2, 64, 64);
+    const earthMat = new THREE.ShaderMaterial({
+      uniforms: THREE.UniformsUtils.clone(EarthShader.uniforms),
+      vertexShader: EarthShader.vertexShader,
+      fragmentShader: EarthShader.fragmentShader
+    });
+    const earth = new THREE.Mesh(earthGeom, earthMat);
+    globeGroup.add(earth);
+
+    // Load textures
+    textureLoader.load('https://threejs.org/examples/textures/planets/earth_atmos_2048.jpg', (tex) => {
+      earthMat.uniforms.uDayTex.value = tex;
+    });
+    textureLoader.load('https://threejs.org/examples/textures/planets/earth_lights_2048.png', (tex) => {
+      earthMat.uniforms.uNightTex.value = tex;
+    });
+
+    // 2. Cloud Layer
+    const cloudGeom = new THREE.SphereGeometry(2.02, 64, 64);
+    const cloudMat = new THREE.MeshStandardMaterial({
+      transparent: true,
+      opacity: 0.3,
+      depthWrite: false,
+      blending: THREE.NormalBlending
+    });
+    const clouds = new THREE.Mesh(cloudGeom, cloudMat);
+    textureLoader.load('https://threejs.org/examples/textures/planets/earth_clouds_2048.png', (tex) => {
+      cloudMat.map = tex;
+      cloudMat.needsUpdate = true;
+    });
+    globeGroup.add(clouds);
+
+    // 3. Atmosphere
+    const atmosGeom = new THREE.SphereGeometry(2.1, 64, 64);
+    const atmosMat = new THREE.ShaderMaterial({
+      uniforms: THREE.UniformsUtils.clone(AtmosphereShader.uniforms),
+      vertexShader: AtmosphereShader.vertexShader,
+      fragmentShader: AtmosphereShader.fragmentShader,
+      side: THREE.BackSide,
+      transparent: true,
+      blending: THREE.AdditiveBlending
+    });
+    const atmosphere = new THREE.Mesh(atmosGeom, atmosMat);
+    scene.add(atmosphere);
+
+    // 4. Stars
+    const starGeom = new THREE.BufferGeometry();
+    const starPos = [];
+    for (let i = 0; i < 5000; i++) {
+      starPos.push((Math.random() - 0.5) * 100, (Math.random() - 0.5) * 100, (Math.random() - 0.5) * 100);
+    }
+    starGeom.setAttribute('position', new THREE.Float32BufferAttribute(starPos, 3));
+    const starMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.05 });
+    const stars = new THREE.Points(starGeom, starMat);
+    scene.add(stars);
+
+    // Lighting
+    const sun = new THREE.DirectionalLight(0xffffff, 1.5);
+    sun.position.set(5, 3, 5);
+    scene.add(sun);
+    scene.add(new THREE.AmbientLight(0x404040, 0.5));
+
+    // High Precision Markers (Surplus Recovery Nodes in India)
+    const addPulseMarker = (lat, lng, size = 0.03) => {
+      const pos = latLongToVector3(lat, lng, 2.01);
+      
+      const markerGeom = new THREE.SphereGeometry(size, 16, 16);
+      const markerMat = new THREE.MeshBasicMaterial({ color: 0x4ADE80 });
+      const marker = new THREE.Mesh(markerGeom, markerMat);
+      marker.position.copy(pos);
+      
+      // Animated pulse ring
+      const ringGeom = new THREE.RingGeometry(size * 1.5, size * 2, 32);
+      const ringMat = new THREE.MeshBasicMaterial({ color: 0x4ADE80, side: THREE.DoubleSide, transparent: true });
+      const ring = new THREE.Mesh(ringGeom, ringMat);
+      ring.position.copy(pos);
+      ring.lookAt(0,0,0);
+      
+      const markerObj = { mesh: marker, ring: ring, startTime: Math.random() * 100 };
+      globeGroup.add(marker);
+      globeGroup.add(ring);
+      return markerObj;
+    };
+
+    const markers = [
+      addPulseMarker(19.076, 72.8777), // Mumbai
+      addPulseMarker(28.6139, 77.209), // Delhi
+      addPulseMarker(12.9716, 77.5946), // Bangalore
+      addPulseMarker(13.0827, 80.2707), // Chennai
+      addPulseMarker(22.5726, 88.3639), // Kolkata
+      addPulseMarker(17.3850, 78.4867), // Hyderabad
+      addPulseMarker(23.0225, 72.5714), // Ahmedabad
+      addPulseMarker(26.8467, 80.9462)  // Lucknow
+    ];
+
+    // Camera & Initial View over India
+    camera.position.copy(latLongToVector3(22, 79, 12)); 
+    camera.lookAt(0, 0, 0);
+
+    const targetDistance = 6.5;
+    const initialPos = camera.position.clone();
+    const targetPos = latLongToVector3(22, 79, targetDistance);
+    let startTime = Date.now();
+    const duration = 2500;
+
+    // Animation Loop
+    const animate = () => {
+      requestAnimationFrame(animate);
+      
+      const now = Date.now();
+      const elapsed = now - startTime;
+      
+      if (elapsed < duration) {
+        const t = elapsed / duration;
+        const ease = 1 - Math.pow(1 - t, 4);
+        camera.position.lerpVectors(initialPos, targetPos, ease);
+        camera.lookAt(0, 0, 0);
+      } else {
+        globeGroup.rotation.y += 0.0008;
+      }
+
+      // Animate pulses
+      markers.forEach(m => {
+        const pulse = (Math.sin(now * 0.005 + m.startTime) + 1) / 2;
+        m.ring.scale.set(1 + pulse, 1 + pulse, 1);
+        m.ring.material.opacity = 1 - pulse;
+      });
+
+      clouds.rotation.y += 0.0004;
+
+      renderer.render(scene, camera);
+    };
+
+    animate();
+
+    // Resize handling
+    window.addEventListener('resize', () => {
+      const w = container.clientWidth || window.innerWidth;
+      const h = container.clientHeight || window.innerHeight;
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h);
+    });
+  </script>
+</body></html>

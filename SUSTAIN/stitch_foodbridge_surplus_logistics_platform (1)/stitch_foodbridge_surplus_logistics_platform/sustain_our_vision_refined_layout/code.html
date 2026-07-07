@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+
+<html class="scroll-smooth dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Our Vision | Sustain</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Fira+Sans:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-surface": "#dbe5dd",
+                    "inverse-primary": "#006d36",
+                    "on-primary": "#003919",
+                    "on-background": "#dbe5dd",
+                    "primary": "#6bfb9a",
+                    "background": "#0c1511",
+                    "outline": "#869486",
+                    "surface-variant": "#2d3732",
+                    "tertiary-fixed": "#c9ead7",
+                    "on-secondary-fixed": "#032017",
+                    "surface-tint": "#4de082",
+                    "surface-container-highest": "#2d3732",
+                    "on-error": "#690005",
+                    "surface-container-high": "#232c27",
+                    "error-container": "#93000a",
+                    "inverse-on-surface": "#29322d",
+                    "on-secondary-container": "#a0bfb0",
+                    "surface": "#0c1511",
+                    "tertiary-fixed-dim": "#adcebc",
+                    "surface-dim": "#0c1511",
+                    "secondary-fixed-dim": "#aecebe",
+                    "on-tertiary-fixed-variant": "#2f4d3f",
+                    "inverse-surface": "#dbe5dd",
+                    "surface-container-lowest": "#07100c",
+                    "secondary": "#aecebe",
+                    "on-surface-variant": "#bccabb",
+                    "on-tertiary-container": "#3a5749",
+                    "tertiary": "#c7e8d5",
+                    "on-tertiary": "#193629",
+                    "tertiary-container": "#abccba",
+                    "secondary-container": "#334f43",
+                    "surface-container-low": "#141d19",
+                    "primary-fixed": "#6dfe9c",
+                    "on-primary-container": "#005e2d",
+                    "primary-container": "#4ade80",
+                    "error": "#ffb4ab",
+                    "on-secondary": "#1a362b",
+                    "surface-container": "#18221d",
+                    "on-error-container": "#ffdad6",
+                    "on-secondary-fixed-variant": "#304c41",
+                    "secondary-fixed": "#caeada",
+                    "surface-bright": "#323b36",
+                    "outline-variant": "#3d4a3e",
+                    "on-primary-fixed": "#00210c",
+                    "on-tertiary-fixed": "#022015",
+                    "on-primary-fixed-variant": "#005227",
+                    "primary-fixed-dim": "#4de082"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gutter": "24px",
+                    "base": "8px",
+                    "stack-md": "16px",
+                    "stack-lg": "32px",
+                    "container-padding-desktop": "32px",
+                    "stack-sm": "8px",
+                    "container-padding-mobile": "16px",
+                    "xl": "64px"
+            },
+            "fontFamily": {
+                    "body-lg": ["Plus Jakarta Sans"],
+                    "headline-lg-mobile": ["Plus Jakarta Sans"],
+                    "headline-lg": ["Plus Jakarta Sans"],
+                    "label-lg": ["Plus Jakarta Sans"],
+                    "label-sm": ["Plus Jakarta Sans"],
+                    "headline-md": ["Plus Jakarta Sans"],
+                    "body-md": ["Plus Jakarta Sans"],
+                    "display-lg": ["Plus Jakarta Sans"]
+            },
+            "fontSize": {
+                    "body-lg": ["16px", {"lineHeight": "26px", "letterSpacing": "0", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-lg": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "body-md": ["14px", {"lineHeight": "22px", "letterSpacing": "0", "fontWeight": "400"}],
+                    "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .hero-gradient {
+            background: linear-gradient(180deg, #0c1511 0%, #141d19 100%);
+        }
+        .cta-gradient {
+            background: linear-gradient(135deg, #005e2d 0%, #003919 100%);
+        }
+        .glass-card {
+            background: rgba(24, 34, 29, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(107, 251, 154, 0.1);
+        }
+        .quote-accent {
+            font-family: 'Plus Jakarta Sans', serif;
+            font-size: 120px;
+            line-height: 0;
+            opacity: 0.1;
+            color: #6bfb9a;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopNavBar -->
+<nav class="w-full top-0 sticky z-50 bg-background/80 backdrop-blur-md border-b border-outline-variant/20">
+<div class="flex justify-between items-center max-w-[1440px] mx-auto px-6 md:px-32 py-4">
+<div class="text-headline-md font-headline-md text-primary cursor-pointer active:scale-95 transition-all">
+            Sustain
+        </div>
+<!-- Desktop Links -->
+<div class="hidden md:flex items-center gap-8 font-body-md text-body-md">
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#">How it works</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Impact</a>
+<a class="text-primary font-bold border-b-2 border-primary pb-1" href="#">Our Vision</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#">For NGOs</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#">For Organizers</a>
+</div>
+<button class="bg-primary text-on-primary px-6 py-2 rounded-full font-label-lg text-label-lg hover:opacity-90 hover:scale-[1.02] active:scale-95 transition-all">
+            Get Started
+        </button>
+</div>
+</nav>
+<main>
+<!-- Section 1: Hero Header -->
+<section class="hero-gradient pt-xl pb-[120px] px-6 md:px-32 text-center overflow-hidden">
+<div class="max-w-4xl mx-auto space-y-6">
+<h1 class="text-display-lg font-display-lg text-primary leading-tight">
+                Why We Built Sustain
+            </h1>
+<p class="font-body-lg text-body-lg text-on-surface leading-relaxed max-w-2xl mx-auto italic opacity-90">
+                "To redefine abundance by ensuring that no nutritious meal is lost to logistics, creating a seamless bridge between excess and essential human need through technology and dignity."
+            </p>
+</div>
+</section>
+<!-- Section 2: Founder Section -->
+<section class="py-xl px-6 md:px-32 bg-surface">
+<div class="max-w-5xl mx-auto grid grid-cols-1 gap-xl items-center max-w-3xl">
+<div class="space-y-4 text-center">
+<h3 class="font-headline-md text-headline-md text-primary tracking-tight">VEDANT SONARE</h3>
+<p class="font-label-sm text-label-sm text-secondary tracking-widest uppercase">Founder, Sustain</p>
+<div class="relative pt-6">
+<span class="absolute -top-4 -left-8 quote-accent select-none">“</span>
+<p class="font-headline-md italic text-on-surface leading-relaxed relative z-10">
+                        Having experienced hunger firsthand, we simply cannot stand to watch anyone go to sleep on an empty stomach. Sustain exists to bridge the gap between event surplus and starvation, ensuring extra food becomes a dignified meal for those who need it most."
+                    </p>
+<p class="mt-4 text-on-surface-variant font-body-md">— <b>Vedant Sonare</b>, Founder, Sustain</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 3: Story Section -->
+<section class="py-[100px] px-6 md:px-32 bg-surface-container-low">
+<div class="max-w-3xl mx-auto space-y-8 text-on-surface-variant">
+<h2 class="text-headline-lg font-headline-lg text-primary text-center mb-12">The Midnight Epiphany</h2>
+<div class="space-y-6 font-body-lg text-body-lg leading-relaxed text-on-surface/80">
+<p>
+                    The journey began on a hot humid night in Mumbai. At a grand wedding celebration, I witnessed tables overflowing with gourmet delicacies—saffron-infused biryanis, roasted meats, and delicate pastries. As the lights dimmed at midnight, crates of untouched, perfectly nutritious food were being wheeled toward disposal bins.
+                </p>
+<p>
+                    Less than a kilometer away, under the flyovers near the railway station, children and families were retiring for the night with empty stomachs. The gap wasn't a lack of food; it was a total failure of logistics. The abundance existed, but there was no way to move it with the speed and safety that perishables require.
+                </p>
+<p>
+                    We quickly realized that manual coordination—WhatsApp groups and phone calls—couldn't scale. To truly solve hunger in a country as vast as India, we needed a logistics-first approach. We needed real-time tracking, cold-chain verification, and a professional digital infrastructure that could match the efficiency of any global delivery giant.
+                </p>
+<p>
+                    Today, Sustain is more than a web portal. Our vision is to become the nationwide standard for food rescue infrastructure. By 2026, we aim to be operational in 50 major Indian cities, creating a future where "leftover" is a term of the past, replaced by "redistributed abundance."
+                </p>
+</div>
+</div>
+</section>
+<!-- Section 4: Our Values Row -->
+<section class="py-xl px-6 md:px-32 bg-surface">
+<div class="max-w-[1440px] mx-auto text-center mb-16 max-w-3xl">
+<p class="text-label-sm font-label-sm text-primary tracking-widest uppercase mb-2">Principles</p>
+<h2 class="text-headline-lg font-headline-lg text-on-surface">The Values That Drive Our Tech</h2>
+</div>
+<div class="max-w-[1200px] mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-3xl">
+<!-- Value Card: Dignity -->
+<!-- Value Card: Transparency -->
+<div class="glass-card p-8 rounded-2xl shadow-sm hover:border-primary/40 transition-all group">
+<div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-primary text-[32px]">visibility</span>
+</div>
+<h4 class="font-headline-md text-headline-md text-on-surface mb-3">Transparency</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">Real-time tracking from pickup to plate. Donors see exactly where their impact lands through verifiable data.</p>
+</div>
+<!-- Value Card: Speed -->
+<div class="glass-card p-8 rounded-2xl shadow-sm hover:border-primary/40 transition-all group">
+<div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-primary text-[32px]">bolt</span>
+</div>
+<h4 class="font-headline-md text-headline-md text-on-surface mb-3">Speed</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">A logistics-first mindset. For perishables, every minute counts, and our AI-routing ensures zero delays.</p>
+</div>
+<!-- Value Card: Community -->
+<div class="glass-card p-8 rounded-2xl shadow-sm hover:border-primary/40 transition-all group">
+<div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-primary text-[32px]">groups</span>
+</div>
+<h4 class="font-headline-md text-headline-md text-on-surface mb-3">Community</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">A verified network of NGO partners, ensuring that food reaches those who need it most, safely.</p>
+</div>
+</div>
+</section>
+<!-- Section 5: Our Reach Strip -->
+<section class="py-xl px-6 md:px-32 bg-background">
+<div class="max-w-4xl mx-auto flex flex-col items-center gap-8">
+<div class="w-full h-[400px] rounded-3xl bg-surface-container-high/20 relative flex items-center justify-center overflow-hidden border border-outline-variant/10 shadow-inner group" id="india-map-canvas">
+<img class="w-full h-full object-contain opacity-50 mix-blend-screen brightness-125 filter grayscale hover:grayscale-0 transition-all duration-700" data-alt="A minimalist, stylized digital map of India in a sophisticated dark mode architectural style. The map features a neon green glow emerging from major metropolitan hubs." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBbyB-ZR4Ifuz_wn5Zb9L9dKn8nupyEWLmpPtKWAvJUtpUHrip0yySKDryuXUXYE7LXINkgWTw7Zs6AlRavYbhv0ErDlkjnYi7dr2ooaaTul2Cwenpynik_0TOBNfrk4fF9L5oYztcJeDzbKCTwtaz2R7NwWysaALBsMQ3YchsAtOBpm346MORDFwg-nKo9MTZlyXTVmfPA03JTODCCX79WjSPVVkmZxCKcvxSVlQi4exkkXr8UBa9GOw"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent pointer-events-none"></div>
+</div>
+<div class="text-center">
+<p class="font-headline-md text-headline-md text-primary">Growing city by city across India.</p>
+<p class="text-label-lg text-on-surface-variant mt-2">50 Cities. 1 Goal. Zero Waste.</p>
+</div>
+</div>
+</section>
+<!-- Section 6: Closing CTA -->
+<section class="cta-gradient py-24 px-6 md:px-32 text-on-primary text-center">
+<div class="max-w-2xl mx-auto space-y-8">
+<h2 class="text-display-lg font-display-lg">Join us in ending the waste-hunger gap.</h2>
+<button class="bg-primary text-on-primary px-10 py-4 rounded-full font-headline-md text-headline-md shadow-2xl hover:scale-105 active:scale-95 transition-all">
+                Join the Mission
+            </button>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full py-xl bg-surface-container-lowest border-t border-outline-variant/10">
+<div class="flex flex-col items-center gap-8 max-w-[1440px] mx-auto px-6 md:px-32">
+<div class="text-headline-md font-headline-md text-primary">
+            Sustain
+        </div>
+<div class="flex gap-8 flex-wrap justify-center font-body-md text-body-md">
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Terms of Service</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Contact Support</a>
+</div>
+<div class="text-on-surface-variant text-label-sm">
+            © 2024 Sustain. Efficiency in abundance.
+        </div>
+</div>
+</footer>
+<script>
+    // Micro-interactions for map glow
+    const mapCanvas = document.getElementById('india-map-canvas');
+    if (mapCanvas) {
+        mapCanvas.addEventListener('mousemove', (e) => {
+            const rect = mapCanvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            mapCanvas.style.setProperty('--mouse-x', `${x}px`);
+            mapCanvas.style.setProperty('--mouse-y', `${y}px`);
+        });
+    }
+</script>
+</body></html>
