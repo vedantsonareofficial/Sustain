@@ -36,11 +36,20 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <div className="flex flex-col min-h-screen relative w-full overflow-x-hidden" ref={sectionsRef}>
+    <div className="flex flex-col min-h-screen relative w-full overflow-x-hidden pb-16" ref={sectionsRef}>
       <Navbar />
 
       {/* Hero Section */}
-      <header className="relative pt-32 pb-20 overflow-hidden bg-surface/50 backdrop-blur-[2px] w-full">
+      <header className="relative pt-32 pb-20 overflow-hidden bg-surface/50 backdrop-blur-[2px] w-full min-h-[90vh] md:min-h-screen flex items-center">
+        {/* Background 3D Globe */}
+        <div className="absolute right-[-120px] bottom-[-120px] md:right-[-300px] md:bottom-[-350px] w-[450px] h-[450px] md:w-[950px] md:h-[950px] pointer-events-none -z-10 opacity-75 dark:opacity-85">
+          <GlobeSwitcher />
+        </div>
+
+        {/* Subtle gradient overlay to ensure text readability */}
+        <div className="absolute inset-0 bg-gradient-to-r from-surface via-surface/85 to-surface/30 -z-10 pointer-events-none md:block hidden" />
+        <div className="absolute inset-0 bg-gradient-to-b from-surface via-surface/95 to-surface/40 -z-10 pointer-events-none md:hidden block" />
+
         <div className="max-w-7xl mx-auto px-6 md:px-32 w-full">
           <div className="flex flex-col md:flex-row items-center gap-12">
             {/* Left Content */}
@@ -65,24 +74,8 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Right Visual / Map Placeholder */}
-            <div className="flex-1 relative w-full aspect-square md:aspect-auto">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--color-primary)_0%,_transparent_70%)] opacity-20 -z-0"></div>
-              <div
-                className="relative w-full h-[500px] bg-surface-container-low/60 backdrop-blur-sm rounded-[40px] overflow-hidden shadow-2xl border border-outline-variant/30 z-10"
-                id="india-map-canvas"
-              >
-                <GlobeSwitcher />
-                <div className="absolute bottom-6 left-6 bg-surface-container-high/70 backdrop-blur-md p-4 rounded-2xl shadow-lg border border-outline-variant/30 max-w-[240px] z-20 pointer-events-none">
-                  <p className="text-xs text-primary font-bold uppercase tracking-wider mb-2 font-headline">Real-time Impact</p>
-                  <p className="text-sm text-on-surface font-body leading-relaxed">
-                    Connecting 5,000+ donation points to verified NGOs across major Indian metros.
-                  </p>
-                </div>
-              </div>
-              <div className="absolute -top-6 -right-6 w-24 h-24 bg-primary-fixed-dim/20 rounded-full blur-2xl animate-pulse"></div>
-              <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-secondary-fixed-dim/20 rounded-full blur-2xl animate-pulse"></div>
-            </div>
+            {/* Right Spacing Column (keeps Left Content aligned left) */}
+            <div className="flex-1 hidden md:block pointer-events-none" />
           </div>
         </div>
       </header>
@@ -256,6 +249,26 @@ export default function LandingPage() {
 
       <Footer variant="landing" />
       <ChatWidget />
+
+      {/* Fixed Bottom Stats Bar */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 bg-surface/85 backdrop-blur-md border-t border-outline-variant/30 py-3 px-6 md:px-32 shadow-lg">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-xs md:text-sm font-headline text-on-surface">
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] md:text-xs uppercase tracking-wider text-primary font-bold">Recovery Points</span>
+            <span className="font-bold text-on-surface">1,200+</span>
+          </div>
+          <div className="hidden md:block w-px h-4 bg-outline-variant/30" />
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] md:text-xs uppercase tracking-wider text-primary font-bold">Meals Saved Monthly</span>
+            <span className="font-bold text-on-surface">85,000+</span>
+          </div>
+          <div className="hidden md:block w-px h-4 bg-outline-variant/30" />
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] md:text-xs uppercase tracking-wider text-primary font-bold">Active Hubs</span>
+            <span className="font-semibold text-on-surface-variant">Mumbai, Delhi, Bengaluru, Chennai, Kolkata</span>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
