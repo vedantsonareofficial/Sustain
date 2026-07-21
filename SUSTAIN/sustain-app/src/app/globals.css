@@ -226,6 +226,21 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
+.food-card-glass {
+  background: rgba(var(--glass-bg), 0.6);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+@keyframes pulse-soft-anim {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.pulse-soft {
+  animation: pulse-soft-anim 1.5s ease-in-out infinite;
+}
+
 .card-shadow {
   box-shadow: var(--card-shadow);
 }
@@ -242,6 +257,16 @@ body {
 .gradient-btn:hover {
   transform: translateY(-2px);
   box-shadow: var(--btn-hover-shadow);
+}
+
+.forest-gradient-btn {
+  background: linear-gradient(135deg, #006d36 0%, #2d9c5e 100%);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.forest-gradient-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0, 109, 54, 0.3);
 }
 
 .input-void {

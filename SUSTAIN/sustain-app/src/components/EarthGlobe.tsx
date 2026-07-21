@@ -56,7 +56,9 @@ export function EarthGlobe() {
           float dotNL = dot(vNormal, uSunDirection);
           float dayWeight = smoothstep(-0.4, 0.4, dotNL);
           
-          vec3 color = mix(nightColor * 0.6, dayColor, dayWeight);
+          // Cap dayColor to prevent white glare from bright texture regions
+          vec3 clampedDay = min(dayColor * 0.85, vec3(0.78));
+          vec3 color = mix(nightColor * 0.6, clampedDay, dayWeight);
           gl_FragColor = vec4(color, 1.0);
         }
       `
@@ -65,8 +67,8 @@ export function EarthGlobe() {
     const AtmosphereShader = {
       uniforms: {
         glowColor: { value: new THREE.Color(ATMOSPHERE_COLOR) },
-        coefficient: { value: 0.08 },
-        power: { value: 4.0 }
+        coefficient: { value: 0.04 },
+        power: { value: 4.5 }
       },
       vertexShader: `
         varying vec3 vNormal;

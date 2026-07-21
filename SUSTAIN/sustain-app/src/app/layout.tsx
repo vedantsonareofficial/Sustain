@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, Fira_Sans } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { AuthProvider } from "@/components/AuthProvider";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   variable: "--font-headline",
@@ -38,7 +39,7 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col font-body bg-background text-on-background bg-pattern transition-colors duration-300">
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider><AuthProvider>{children}</AuthProvider></ThemeProvider>
       </body>
     </html>
   );
