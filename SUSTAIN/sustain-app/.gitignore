@@ -31,7 +31,6 @@ yarn-error.log*
 next-env.d.ts
 
 # Stale duplicate config files
-next.config.mjs
 postcss.config.mjs
 
 # OS
