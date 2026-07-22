@@ -17,7 +17,7 @@ const firaSans = Fira_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "FoodBridge | Turn Surplus Into Support",
+  title: "Sustain | Turn Surplus Into Support",
   description: "The ultimate logistics platform bridging the gap between corporate event surplus and community NGOs across India. Rescue meals, reduce waste, and feed thousands with precision.",
 };
 

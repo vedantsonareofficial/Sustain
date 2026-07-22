@@ -55,7 +55,7 @@ export function ChatWidget() {
         {
           id: (Date.now() + 1).toString(),
           sender: "bot",
-          text: `Here is the information about "${text}": FoodBridge connects event organizers with nearby verified NGOs. You can manage everything via your logistics dashboard.`,
+          text: `Here is the information about "${text}": Sustain connects event organizers with nearby verified NGOs. You can manage everything via your logistics dashboard.`,
         },
       ]);
     }, 1000);

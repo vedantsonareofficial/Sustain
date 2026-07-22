@@ -267,7 +267,7 @@ export default function LandingPage() {
               <div className="bg-surface-container/40 backdrop-blur-md p-8 rounded-3xl border border-outline-variant shadow-md hover:bg-surface-container/60 transition-colors">
                 <span className="material-symbols-outlined text-primary text-[40px] mb-4">format_quote</span>
                 <p className="font-body text-lg italic text-on-surface mb-6 leading-relaxed">
-                  "FoodBridge changed our catering operations completely. We no longer feel the guilt of waste; we see the data of our impact."
+                  "Sustain changed our catering operations completely. We no longer feel the guilt of waste; we see the data of our impact."
                 </p>
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-full overflow-hidden shadow-sm border border-outline-variant/40">
@@ -287,7 +287,7 @@ export default function LandingPage() {
               <div className="bg-surface-container/40 backdrop-blur-md p-8 rounded-3xl border border-outline-variant shadow-md hover:bg-surface-container/60 transition-colors">
                 <span className="material-symbols-outlined text-primary text-[40px] mb-4">format_quote</span>
                 <p className="font-body text-lg italic text-on-surface mb-6 leading-relaxed">
-                  "The predictability of FoodBridge allows our community kitchen to plan meals days in advance. It's a logistics miracle."
+                  "The predictability of Sustain allows our community kitchen to plan meals days in advance. It's a logistics miracle."
                 </p>
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-full overflow-hidden shadow-sm border border-outline-variant/40">
