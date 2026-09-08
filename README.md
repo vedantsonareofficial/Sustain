@@ -2,8 +2,8 @@
 
 > Turning surplus into support — connecting Indian event organizers with NGOs to rescue food, reduce waste, and feed communities.
 
-🔗 **Live Site:** [sustain-yourname.vercel.app](https://sustain-vedant.vercel.app)
-
+🔗 **Live Site:** 
+https://sustainapp.netlify.app/
 ---
 
 ## 💡 Why I Built This
@@ -30,7 +30,7 @@ To build India's most trusted surplus-food recovery network — making food wast
 - **Backend & Database:** Supabase (PostgreSQL, Auth, Row Level Security)
 - **Design:** Google Stitch
 - **Development:** Google Antigravity
-- **Deployment:** Vercel
+- **Deployment:** Netlify 
 
 ## 🗄️ Database Structure
 
